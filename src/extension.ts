@@ -1,73 +1,116 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
-import * as vscode from 'vscode';
-import { ConfigurationScope, workspace, WorkspaceFolder, Uri,  } from 'vscode';
-import { findUvBinaryPath } from './uv_binary';
-import path from 'path';
-import * as fs from 'fs-extra';
-import { UvVscodeSettings } from './settings';
+import * as vscode from "vscode";
+import { workspace } from "vscode";
+import { findUvBinaryPath } from "./uv_binary";
+import { type UvVscodeSettings } from "./settings";
+import { PythonExtension } from "@vscode/python-extension";
+import SelectScriptInterpreterCommand from "./commands/selectInlineScriptInterpreter";
+import VscodeApiInterpreterManager from "./impl/selectInterpreterCallback";
+import AddDependencyCommand from "./commands/addDependency";
+import VscodeApiInputRequest from "./impl/inputRequester";
+import DependencyCodeLensProvider from "./ui/dependencyCodeLensProvider";
+import RemoveDependencyCommand from "./commands/removeDependency";
+import ScriptEnvironmentCodeLensProvider from "./ui/selectScriptEnvironmentProvider";
+import ExitScriptEnvironment from "./commands/exitScriptEnvironment";
+import ShellSubcommandExecutor from "./impl/subcommandExecutor";
+import { getActiveTextEditorFilePath, getProjectRoot } from "./utils/vscode_";
 
-async function getProjectRoot(): Promise<WorkspaceFolder> {
-  const workspaces: readonly WorkspaceFolder[] = workspace.workspaceFolders ?? [];
-  if (workspaces.length === 0) {
-    return {
-      uri: Uri.file(process.cwd()),
-      name: path.basename(process.cwd()),
-      index: 0,
-    };
-  } else if (workspaces.length === 1) {
-    return workspaces[0];
-  } else {
-    let rootWorkspace = workspaces[0];
-    let root = undefined;
-    for (const w of workspaces) {
-      if (await fs.pathExists(w.uri.fsPath)) {
-        root = w.uri.fsPath;
-        rootWorkspace = w;
-        break;
-      }
-    }
-
-    for (const w of workspaces) {
-      if (root && root.length > w.uri.fsPath.length && (await fs.pathExists(w.uri.fsPath))) {
-        root = w.uri.fsPath;
-        rootWorkspace = w;
-      }
-    }
-    return rootWorkspace;
-  }
-}
-
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
 export async function activate(context: vscode.ExtensionContext) {
+  const projectRoot = await getProjectRoot();
+  const config: UvVscodeSettings = workspace.getConfiguration(
+    "uv-vscode",
+    projectRoot,
+  ) as UvVscodeSettings;
+  const uvBinaryPath = await findUvBinaryPath({ settings: config });
+  const pythonExtension = await PythonExtension.api();
+  await pythonExtension.ready;
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "uv-vscode" is now active!');
+  const dependencyProvider = new DependencyCodeLensProvider();
+  vscode.languages.registerCodeLensProvider(
+    [
+      { scheme: "file", pattern: "**/*.py" },
+      { scheme: "file", pattern: "**/*.toml" },
+    ],
+    dependencyProvider,
+  );
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	const disposable = vscode.commands.registerCommand('uv-vscode.helloWorld', async () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-			let projectRoot = await getProjectRoot();
-			let config: UvVscodeSettings = workspace.getConfiguration('uv-vscode', projectRoot) as UvVscodeSettings;
+  const scriptProvider = new ScriptEnvironmentCodeLensProvider();
+  vscode.languages.registerCodeLensProvider(
+    { scheme: "file", language: "python" },
+    scriptProvider,
+  );
 
-			let uvBinaryPath = await findUvBinaryPath({ settings: config });
+  // To trigger the initial rendering of code lenses
+  setTimeout(() => {
+    scriptProvider.refresh();
+    dependencyProvider.refresh();
+  }, 1000);
 
-			vscode.window.showInformationMessage(`Uv path: ${uvBinaryPath}`);
+  const selectScriptInterpreterDisposable = vscode.commands.registerCommand(
+    "uv-vscode.selectScriptInterpreter",
+    async () => {
+      // TODO: move to the command
+      const activeEditorFilePath = getActiveTextEditorFilePath();
+      if (!activeEditorFilePath) {
+        vscode.window.showErrorMessage("No active text editor found.");
+        return;
+      }
 
-	});
-	
-	let projectRoot = await getProjectRoot();
-	let config = workspace.getConfiguration('uv-vscode', projectRoot);
+      const selectScriptInterpreterCommand = new SelectScriptInterpreterCommand(
+        {
+          activeFilePath: activeEditorFilePath,
+          uvBinaryPath,
+          projectRoot: projectRoot.uri.fsPath,
+          interpreterManager: new VscodeApiInterpreterManager(pythonExtension),
+          subcommandExecutor: new ShellSubcommandExecutor(),
+        },
+      );
+      await selectScriptInterpreterCommand.run();
+    },
+  );
 
-	vscode.window.showInformationMessage(`Project root: ${projectRoot.uri.fsPath}`);
-	vscode.window.showInformationMessage(`Project configuration: ${JSON.stringify(config)}`);
+  const exitScriptEnvironmentDisposable = vscode.commands.registerCommand(
+    "uv-vscode.exitScriptEnvironment",
+    async () => {
+      const command = new ExitScriptEnvironment(
+        new VscodeApiInterpreterManager(pythonExtension),
+      );
+      await command.run();
+    },
+  );
 
-	context.subscriptions.push(disposable);
+  const addDependencyDisposable = vscode.commands.registerCommand(
+    "uv-vscode.addDependency",
+    async () => {
+      const command = new AddDependencyCommand({
+        inputRequester: new VscodeApiInputRequest(),
+        subcommandExecutor: new ShellSubcommandExecutor(),
+        projectRoot: projectRoot.uri.fsPath,
+        uvBinaryPath,
+        activeFilePath: getActiveTextEditorFilePath(),
+      });
+      await command.run();
+    },
+  );
+  const removeDependencyDisposable = vscode.commands.registerCommand(
+    "uv-vscode.removeDependency",
+    async () => {
+      const command = new RemoveDependencyCommand({
+        inputRequester: new VscodeApiInputRequest(),
+        subcommandExecutor: new ShellSubcommandExecutor(),
+        projectRoot: projectRoot.uri.fsPath,
+        uvBinaryPath,
+        activeFilePath: getActiveTextEditorFilePath(),
+      });
+      await command.run();
+    },
+  );
+
+  context.subscriptions.push(selectScriptInterpreterDisposable);
+  context.subscriptions.push(exitScriptEnvironmentDisposable);
+  context.subscriptions.push(addDependencyDisposable);
+  context.subscriptions.push(removeDependencyDisposable);
 }
 
 // This method is called when your extension is deactivated
