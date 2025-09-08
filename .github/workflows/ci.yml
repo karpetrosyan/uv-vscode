@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions: {}
+
+jobs:
+  ci:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v5
+      - name: "Set up Node.js"
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+      - name: Install dependencies
+        run: npm install
+      - name: Run checks
+        run: npm run lint
+      - name: Run tests
+        run: npm run test
