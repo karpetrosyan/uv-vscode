@@ -1,4 +1,9 @@
-## 0.2.0
+## [0.4.0] - 2025-09-08
+
+### 🐛 Bug Fixes
+
+- Extension importing
+## [0.2.0] - 2025-09-08
 
 ### ⚙️ Miscellaneous Tasks
 
