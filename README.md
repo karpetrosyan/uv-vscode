@@ -11,5 +11,3 @@ A VS Code extension that provides enhanced integration with [uv](https://github.
 ### Enter a [PEP 723](https://peps.python.org/pep-0723/) compatible script environment to get autocompletion and resolve imports correctly.
 
 ![Enter a PEP 723 compatible script environment to get autocompletion and resolve imports correctly.](https://user-images.githubusercontent.com/karpetrosyan/uv-vscode/master/.github/select-script-interpreter.gif)
-
-![Using the "F
