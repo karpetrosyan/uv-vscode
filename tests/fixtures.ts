@@ -33,7 +33,9 @@ export class FakeInterpreterManager implements InterpreterManager {
   ) {}
 
   async select(interpreterPath: string): Promise<void> {
-    this.previousInterpreterPath = this.currentInterpreterPath;
+    if (this.currentInterpreterPath !== interpreterPath) {
+      this.previousInterpreterPath = this.currentInterpreterPath;
+    }
     this.currentInterpreterPath = interpreterPath;
   }
 

@@ -57,3 +57,39 @@ test("SelectScriptInterpreter with script file", async () => {
     `undefined`
   );
 });
+
+test("SelectScriptInterpreter multiple times", async () => {
+  const subcommandExecutor = new FakeSubcommandExecutor([
+    "sync-ok",
+    "some/path",
+    "sync-ok",
+    "some/path",
+  ]);
+  const interpreterManager = new FakeInterpreterManager();
+
+  await withTempDir(async (dir) => {
+    const pythonInline = `
+# /// script
+# dependencies = []
+# ///
+`;
+    writeFileSync(join(dir, "script.py"), pythonInline);
+    const command = new SelectScriptInterpreterCommand({
+      activeFilePath: join(dir, "script.py"),
+      uvBinaryPath: "/uv",
+      projectRoot: "/project",
+      interpreterManager: interpreterManager,
+      subcommandExecutor: subcommandExecutor,
+    });
+
+    await command.run();
+    await command.run();
+  });
+
+  expect(interpreterManager.currentInterpreterPath).toMatchInlineSnapshot(
+    `"some/path"`
+  );
+  expect(interpreterManager.previousInterpreterPath).toMatchInlineSnapshot(
+    `undefined`
+  );
+});

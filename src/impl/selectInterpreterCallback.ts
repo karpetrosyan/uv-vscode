@@ -11,8 +11,13 @@ export default class VscodeApiInterpreterManager implements InterpreterManager {
   }
 
   async select(interpreterPath: string): Promise<void> {
-    previousInterpreterPath =
-      this.pythonApi.environments.getActiveEnvironmentPath().path;
+    if (
+      interpreterPath !==
+      this.pythonApi.environments.getActiveEnvironmentPath().path
+    ) {
+      previousInterpreterPath =
+        this.pythonApi.environments.getActiveEnvironmentPath().path;
+    }
     await this.pythonApi.environments.updateActiveEnvironmentPath(
       interpreterPath,
     );
