@@ -2,117 +2,14 @@
 
 A VS Code extension that provides enhanced integration with [uv](https://github.com/astral-sh/uv), the fast Python package installer and resolver. This extension makes it easier to manage Python dependencies and work with inline script metadata (PEP 723) directly in VS Code.
 
-## Features
+## Highlights
 
-### 🔧 Dependency Management
+### Manage your dependencies directly from the pyproject.toml file or from a [PEP 723](https://peps.python.org/pep-0723/) compatible script.
 
-- **Add Dependencies**: Quickly add Python packages to your project or inline scripts
-- **Remove Dependencies**: Remove packages with a simple command
-- **Smart Detection**: Automatically detects whether you're working with a project or an inline script
+![Manage your dependencies directly from the pyproject.toml file or from a PEP 723 compatible script.](https://user-images.githubusercontent.com/karpetrosyan/uv-vscode/master/.github/add-remove-dependencies.gif)
 
-### 📝 Inline Script Support (PEP 723)
+### Enter a [PEP 723](https://peps.python.org/pep-0723/) compatible script environment to get autocompletion and resolve imports correctly.
 
-- **Script Environment Selection**: Choose and manage Python interpreters for inline scripts
-- **Dependency Code Lenses**: Visual indicators showing dependencies in both `.py` files and `pyproject.toml` files
-- **Environment Management**: Easy switching between different script environments
+![Enter a PEP 723 compatible script environment to get autocompletion and resolve imports correctly.](https://user-images.githubusercontent.com/karpetrosyan/uv-vscode/master/.github/select-script-interpreter.gif)
 
-### 🎯 Code Lenses Integration
-
-- Interactive buttons appear directly in your code for:
-  - Adding dependencies (`+ Add Dependency`)
-  - Removing dependencies (`- Remove Dependency`)
-  - Selecting script interpreters (`Select Script Environment`)
-  - Exiting script environments (`Exit Script Environment`)
-
-## Usage
-
-### Managing Dependencies
-
-1. **Add a Dependency**:
-   - Open a Python file or `pyproject.toml`
-   - Click the `+ Add Dependency` code lens that appears
-   - Or use the Command Palette: `Ctrl+Shift+P` → "Add Dependency"
-
-2. **Remove a Dependency**:
-   - Click the `- Remove Dependency` code lens
-   - Or use the Command Palette: `Ctrl+Shift+P` → "Remove Dependency"
-
-### Working with Inline Scripts (PEP 723)
-
-For Python files with inline metadata blocks:
-
-```python
-#!/usr/bin/env python3
-# /// script
-# dependencies = [
-#   "requests",
-#   "beautifulsoup4",
-# ]
-# ///
-
-import requests
-from bs4 import BeautifulSoup
-```
-
-1. **Select Script Interpreter**:
-   - Click `Select Script Environment` code lens
-
-2. **Exit Script Environment**:
-   - Click `Exit Script Environment` when you're done working with the script
-
-## Commands
-
-The extension provides the following commands accessible via the Command Palette (`Ctrl+Shift+P`):
-
-- `Select Script Interpreter`: Choose a Python interpreter for inline scripts
-- `Exit Script Environment`: Exit the current script environment
-- `Add Dependency`: Add a Python package dependency
-- `Remove Dependency`: Remove a Python package dependency
-
-## Extension Settings
-
-This extension contributes settings under the `uv-vscode` namespace. Configure uv-specific options through VS Code's settings.
-
-## Development
-
-This extension is built with:
-
-- TypeScript
-- VS Code Extension API
-- esbuild for bundling
-- Vitest for testing
-
-### Building from Source
-
-```bash
-# Install dependencies
-npm install
-
-# Build the extension
-npm run compile
-
-# Watch for changes during development
-npm run watch
-```
-
-### Testing
-
-```bash
-# Run tests
-npm test
-
-# Watch tests during development
-npm run watch-tests
-```
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit issues and pull requests.
-
-## License
-
-See [LICENSE](./build/LICENSE) file for details.
-
----
-
-**Enjoy enhanced Python development with uv in VS Code!** 🚀
+![Using the "F
