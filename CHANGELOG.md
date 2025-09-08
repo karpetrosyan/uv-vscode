@@ -1,9 +1,14 @@
-# Change Log
+## 0.2.0
 
-All notable changes to the "uv-vscode" extension will be documented in this file.
+### ⚙️ Miscellaneous Tasks
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
-
-## [Unreleased]
-
-- Initial release
+- Initial commit
+- Remove extension tests module
+- Clean up commands in package.json
+- Add basic ci workflow
+- Fix ci workflow
+- Remove extension-quickstart markdown file
+- Add contents read permission to ci workflow
+- Use npm as a PM
+- Add LICENSE
+- Add github url in package.json
