@@ -51,7 +51,7 @@ export default class SelectScriptInterpreterCommand extends Command {
 
     const inlineScriptInterpreterPath = await this.subcommandExecutor.execute(
       this.uvBinaryPath,
-      ["python", "find", "--script", String(this.activeFilePath)]
+      ["python", "find", "--script", String(this.activeFilePath)],
     );
 
     await this.interpreterManager.select(inlineScriptInterpreterPath);

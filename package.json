@@ -30,14 +30,6 @@
         "title": "Remove Dependency"
       },
       {
-        "command": "uv-vscode.selectInterpreter",
-        "title": "Select Interpreter"
-      },
-      {
-        "command": "uv-vscode.plusClicked",
-        "title": "plusClicked"
-      },
-      {
         "command": "uv-vscode.addDependency",
         "title": "Add Dependency"
       }

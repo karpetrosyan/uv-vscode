@@ -5,27 +5,24 @@ A VS Code extension that provides enhanced integration with [uv](https://github.
 ## Features
 
 ### 🔧 Dependency Management
+
 - **Add Dependencies**: Quickly add Python packages to your project or inline scripts
 - **Remove Dependencies**: Remove packages with a simple command
 - **Smart Detection**: Automatically detects whether you're working with a project or an inline script
 
 ### 📝 Inline Script Support (PEP 723)
+
 - **Script Environment Selection**: Choose and manage Python interpreters for inline scripts
 - **Dependency Code Lenses**: Visual indicators showing dependencies in both `.py` files and `pyproject.toml` files
 - **Environment Management**: Easy switching between different script environments
 
 ### 🎯 Code Lenses Integration
+
 - Interactive buttons appear directly in your code for:
   - Adding dependencies (`+ Add Dependency`)
   - Removing dependencies (`- Remove Dependency`)
   - Selecting script interpreters (`Select Script Environment`)
   - Exiting script environments (`Exit Script Environment`)
-
-## Requirements
-
-- **VS Code**: Version 1.101.0 or higher
-- **Python Extension**: The Microsoft Python extension must be installed
-- **uv**: The uv package manager should be available in your system PATH or bundled with the extension
 
 ## Usage
 
@@ -59,7 +56,6 @@ from bs4 import BeautifulSoup
 
 1. **Select Script Interpreter**:
    - Click `Select Script Environment` code lens
-   - Choose from available Python interpreters
 
 2. **Exit Script Environment**:
    - Click `Exit Script Environment` when you're done working with the script
@@ -80,6 +76,7 @@ This extension contributes settings under the `uv-vscode` namespace. Configure u
 ## Development
 
 This extension is built with:
+
 - TypeScript
 - VS Code Extension API
 - esbuild for bundling
