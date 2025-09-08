@@ -4,7 +4,6 @@ import { join } from "path/posix";
 import type InputRequester from "../src/dependencies/inputRequester";
 import type InterpreterManager from "../src/dependencies/interpreterManager";
 import type SubcommandExecutor from "../src/dependencies/subcommandExecutor";
-import type ExitScriptEnvironment from "../src/commands/exitScriptEnvironment";
 
 export class FakeInputRequester implements InputRequester {
   constructor(public responses: (string | undefined)[]) {}
@@ -29,7 +28,7 @@ export class FakeSubcommandExecutor implements SubcommandExecutor {
 export class FakeInterpreterManager implements InterpreterManager {
   constructor(
     public previousInterpreterPath?: string,
-    public currentInterpreterPath?: string
+    public currentInterpreterPath?: string,
   ) {}
 
   async select(interpreterPath: string): Promise<void> {

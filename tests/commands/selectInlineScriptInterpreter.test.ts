@@ -23,7 +23,7 @@ test("SelectScriptInterpreter with non-script file", async () => {
     });
 
     await expect(command.run()).rejects.toThrowError(
-      "The script has not a valid inline metadata."
+      "The script has not a valid inline metadata.",
     );
   });
 });
@@ -51,10 +51,10 @@ test("SelectScriptInterpreter with script file", async () => {
   });
 
   expect(interpreterManager.currentInterpreterPath).toMatchInlineSnapshot(
-    `"some/path"`
+    `"some/path"`,
   );
   expect(interpreterManager.previousInterpreterPath).toMatchInlineSnapshot(
-    `undefined`
+    `undefined`,
   );
 });
 
@@ -87,9 +87,9 @@ test("SelectScriptInterpreter multiple times", async () => {
   });
 
   expect(interpreterManager.currentInterpreterPath).toMatchInlineSnapshot(
-    `"some/path"`
+    `"some/path"`,
   );
   expect(interpreterManager.previousInterpreterPath).toMatchInlineSnapshot(
-    `undefined`
+    `undefined`,
   );
 });

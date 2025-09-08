@@ -47,7 +47,7 @@ test("Processes simple pyproject.toml metadata", () => {
 
   const finalState = feedEventsToState(
     lines,
-    IdleState({ inlineMetadataFromScript: false })
+    IdleState({ inlineMetadataFromScript: false }),
   );
 
   expect(finalState).toMatchInlineSnapshot(`
@@ -90,7 +90,7 @@ test("Processes simple inline metadata", () => {
 
   const finalState = feedEventsToState(
     lines,
-    IdleState({ inlineMetadataFromScript: true })
+    IdleState({ inlineMetadataFromScript: true }),
   );
 
   expect(finalState).toMatchInlineSnapshot(`

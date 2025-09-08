@@ -11,6 +11,10 @@ test("Test ExitScriptEnvironmentCommand basic", async () => {
 
   await command.run();
 
-  expect(interpreterManager.previousInterpreterPath).toMatchInlineSnapshot(`undefined`);
-  expect(interpreterManager.currentInterpreterPath).toMatchInlineSnapshot(`"some/path"`);
+  expect(interpreterManager.previousInterpreterPath).toMatchInlineSnapshot(
+    `undefined`,
+  );
+  expect(interpreterManager.currentInterpreterPath).toMatchInlineSnapshot(
+    `"some/path"`,
+  );
 });

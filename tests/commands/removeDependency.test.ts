@@ -39,7 +39,7 @@ test("RemoveDependency without input", async () => {
   });
 
   await expect(command.run()).rejects.toThrowError(
-    "No input provided for the dependency."
+    "No input provided for the dependency.",
   );
 });
 
