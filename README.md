@@ -6,8 +6,8 @@ A VS Code extension that provides enhanced integration with [uv](https://github.
 
 ### Manage your dependencies directly from the pyproject.toml file or from a [PEP 723](https://peps.python.org/pep-0723/) compatible script.
 
-![Manage your dependencies directly from the pyproject.toml file or from a PEP 723 compatible script.](https://user-images.githubusercontent.com/karpetrosyan/uv-vscode/main/.github/add-remove-dependencies.gif)
+![Manage your dependencies directly from the pyproject.toml file or from a PEP 723 compatible script.](https://raw.githubusercontent.com/karpetrosyan/uv-vscode/main/.github/add-remove-dependencies.gif)
 
 ### Enter a [PEP 723](https://peps.python.org/pep-0723/) compatible script environment to get autocompletion and resolve imports correctly.
 
-![Enter a PEP 723 compatible script environment to get autocompletion and resolve imports correctly.](https://user-images.githubusercontent.com/karpetrosyan/uv-vscode/main/.github/select-script-interpreter.gif)
+![Enter a PEP 723 compatible script environment to get autocompletion and resolve imports correctly.](https://raw.githubusercontent.com/karpetrosyan/uv-vscode/main/.github/select-script-interpreter.gif)
