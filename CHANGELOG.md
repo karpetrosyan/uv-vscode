@@ -1,15 +1,28 @@
+## [0.8.0] - 2025-09-08
+
+### 🐛 Bug Fixes
+
+- *(docs)* Fix readme
+- *(docs)* Fix links to the gifs
+
+### 📚 Documentation
+
+- Improve readme, add gifs for demo
+
+### ⚙️ Miscellaneous Tasks
+
+- Fix gif paths
+- Format with prettier when fixing lint errors
 ## [0.6.0] - 2025-09-08
 
 ### 🚀 Features
 
 - Don't overwrite previous interpreter with the same one
-
 ## [0.4.0] - 2025-09-08
 
 ### 🐛 Bug Fixes
 
 - Extension importing
-
 ## [0.2.0] - 2025-09-08
 
 ### ⚙️ Miscellaneous Tasks
