@@ -4,6 +4,7 @@ import { join } from "path/posix";
 import type InputRequester from "../src/dependencies/inputRequester";
 import type InterpreterManager from "../src/dependencies/interpreterManager";
 import type SubcommandExecutor from "../src/dependencies/subcommandExecutor";
+import type Logger from "../src/dependencies/logger";
 
 export class FakeInputRequester implements InputRequester {
   constructor(public responses: (string | undefined)[]) {}
@@ -40,6 +41,24 @@ export class FakeInterpreterManager implements InterpreterManager {
 
   async previous(): Promise<string | undefined> {
     return this.previousInterpreterPath;
+  }
+}
+
+export class FakeLogger implements Logger {
+  constructor(public collectedLogs: (string | Error)[] = []) {}
+
+  debug(message: string): void {
+    this.collectedLogs.push(message);
+  }
+  error(message: string | Error): void {
+    this.collectedLogs.push(message);
+  }
+  info(message: string): void {
+    this.collectedLogs.push(message);
+  }
+
+  isEnabledFor(level: "debug" | "error" | "info"): boolean {
+    return level ? true : true;
   }
 }
 

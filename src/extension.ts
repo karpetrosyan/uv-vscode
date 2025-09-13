@@ -15,33 +15,50 @@ import ScriptEnvironmentCodeLensProvider from "./ui/selectScriptEnvironmentProvi
 import ExitScriptEnvironment from "./commands/exitScriptEnvironment";
 import ShellSubcommandExecutor from "./impl/subcommandExecutor";
 import { getActiveTextEditorFilePath, getProjectRoot } from "./utils/vscode_";
+import ExtensionLogger from "./impl/logger";
 
 export async function activate(context: vscode.ExtensionContext) {
+  const validateRepoOutputChannel = vscode.window.createOutputChannel("UV", {
+    log: true,
+  });
+
+  // We need a wrapper logger to isolate commands from the infrastructure (vscode api)
+  const logger = new ExtensionLogger(validateRepoOutputChannel);
+  logger.info("Logger initialized");
+
   const projectRoot = await getProjectRoot();
+  logger.info(`Project root: ${projectRoot.uri.fsPath}`);
+
   const config: UvVscodeSettings = workspace.getConfiguration(
     "uv-vscode",
-    projectRoot,
+    projectRoot
   ) as UvVscodeSettings;
+  logger.info(`Configuration loaded: ${JSON.stringify(config)}`);
+
   const uvBinaryPath = await findUvBinaryPath({ settings: config });
+  logger.info(`Using uv binary at path: ${uvBinaryPath}`);
+
   const pythonExtension = await PythonExtension.api();
   await pythonExtension.ready;
 
   const dependencyProvider = new DependencyCodeLensProvider();
+
   vscode.languages.registerCodeLensProvider(
     [
       { scheme: "file", pattern: "**/*.py" },
       { scheme: "file", pattern: "**/*.toml" },
     ],
-    dependencyProvider,
+    dependencyProvider
   );
+  logger.info("DependencyCodeLensProvider registered");
 
   const scriptProvider = new ScriptEnvironmentCodeLensProvider();
   vscode.languages.registerCodeLensProvider(
     { scheme: "file", language: "python" },
-    scriptProvider,
+    scriptProvider
   );
+  logger.info("ScriptEnvironmentCodeLensProvider registered");
 
-  // To trigger the initial rendering of code lenses
   setTimeout(() => {
     scriptProvider.refresh();
     dependencyProvider.refresh();
@@ -63,11 +80,12 @@ export async function activate(context: vscode.ExtensionContext) {
           uvBinaryPath,
           projectRoot: projectRoot.uri.fsPath,
           interpreterManager: new VscodeApiInterpreterManager(pythonExtension),
-          subcommandExecutor: new ShellSubcommandExecutor(),
-        },
+          subcommandExecutor: new ShellSubcommandExecutor(logger),
+          logger,
+        }
       );
       await selectScriptInterpreterCommand.run();
-    },
+    }
   );
 
   const exitScriptEnvironmentDisposable = vscode.commands.registerCommand(
@@ -75,9 +93,10 @@ export async function activate(context: vscode.ExtensionContext) {
     async () => {
       const command = new ExitScriptEnvironment(
         new VscodeApiInterpreterManager(pythonExtension),
+        logger
       );
       await command.run();
-    },
+    }
   );
 
   const addDependencyDisposable = vscode.commands.registerCommand(
@@ -85,26 +104,28 @@ export async function activate(context: vscode.ExtensionContext) {
     async () => {
       const command = new AddDependencyCommand({
         inputRequester: new VscodeApiInputRequest(),
-        subcommandExecutor: new ShellSubcommandExecutor(),
+        subcommandExecutor: new ShellSubcommandExecutor(logger),
         projectRoot: projectRoot.uri.fsPath,
         uvBinaryPath,
         activeFilePath: getActiveTextEditorFilePath(),
+        logger,
       });
       await command.run();
-    },
+    }
   );
   const removeDependencyDisposable = vscode.commands.registerCommand(
     "uv-vscode.removeDependency",
     async () => {
       const command = new RemoveDependencyCommand({
         inputRequester: new VscodeApiInputRequest(),
-        subcommandExecutor: new ShellSubcommandExecutor(),
+        subcommandExecutor: new ShellSubcommandExecutor(logger),
         projectRoot: projectRoot.uri.fsPath,
         uvBinaryPath,
         activeFilePath: getActiveTextEditorFilePath(),
+        logger,
       });
       await command.run();
-    },
+    }
   );
 
   context.subscriptions.push(selectScriptInterpreterDisposable);

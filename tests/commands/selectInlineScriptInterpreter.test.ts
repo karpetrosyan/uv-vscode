@@ -1,6 +1,7 @@
 import { expect, test } from "vitest";
 import {
   FakeInterpreterManager,
+  FakeLogger,
   FakeSubcommandExecutor,
   withTempDir,
 } from "../fixtures";
@@ -14,17 +15,20 @@ test("SelectScriptInterpreter with non-script file", async () => {
 
   withTempDir(async (dir) => {
     writeFileSync(join(dir, "script.py"), "print(10");
+    const logger = new FakeLogger();
     const command = new SelectScriptInterpreterCommand({
       activeFilePath: join(dir, "script.py"),
       uvBinaryPath: "/uv",
       projectRoot: "/project",
       interpreterManager: interpreterManager,
       subcommandExecutor: subcommandExecutor,
+      logger: logger,
     });
 
     await expect(command.run()).rejects.toThrowError(
       "The script has not a valid inline metadata.",
     );
+    expect(logger.collectedLogs).toMatchInlineSnapshot(`[]`);
   });
 });
 
@@ -39,14 +43,15 @@ test("SelectScriptInterpreter with script file", async () => {
 # ///
 `;
     writeFileSync(join(dir, "script.py"), pythonInline);
+    const logger = new FakeLogger();
     const command = new SelectScriptInterpreterCommand({
       activeFilePath: join(dir, "script.py"),
       uvBinaryPath: "/uv",
       projectRoot: "/project",
       interpreterManager: interpreterManager,
       subcommandExecutor: subcommandExecutor,
+      logger,
     });
-
     await command.run();
   });
 
@@ -74,12 +79,14 @@ test("SelectScriptInterpreter multiple times", async () => {
 # ///
 `;
     writeFileSync(join(dir, "script.py"), pythonInline);
+    const logger = new FakeLogger();
     const command = new SelectScriptInterpreterCommand({
       activeFilePath: join(dir, "script.py"),
       uvBinaryPath: "/uv",
       projectRoot: "/project",
       interpreterManager: interpreterManager,
       subcommandExecutor: subcommandExecutor,
+      logger,
     });
 
     await command.run();

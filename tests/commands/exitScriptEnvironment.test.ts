@@ -1,13 +1,14 @@
 import { expect, test } from "vitest";
 import ExitScriptEnvironment from "../../src/commands/exitScriptEnvironment";
-import { FakeInterpreterManager } from "../fixtures";
+import { FakeInterpreterManager, FakeLogger } from "../fixtures";
 
 test("Test ExitScriptEnvironmentCommand basic", async () => {
   const interpreterManager = new FakeInterpreterManager();
 
   await interpreterManager.select("some/path");
 
-  const command = new ExitScriptEnvironment(interpreterManager);
+  const logger = new FakeLogger();
+  const command = new ExitScriptEnvironment(interpreterManager, logger);
 
   await command.run();
 
@@ -17,4 +18,9 @@ test("Test ExitScriptEnvironmentCommand basic", async () => {
   expect(interpreterManager.currentInterpreterPath).toMatchInlineSnapshot(
     `"some/path"`,
   );
+  expect(logger.collectedLogs).toMatchInlineSnapshot(`
+    [
+      "Exiting script environment. Previous interpreter: none",
+    ]
+  `);
 });

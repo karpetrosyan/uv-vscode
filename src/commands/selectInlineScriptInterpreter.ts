@@ -2,6 +2,7 @@ import Command from "./base";
 import type InterpreterManager from "../dependencies/interpreterManager";
 import type SubcommandExecutor from "../dependencies/subcommandExecutor";
 import { isScriptPath } from "../utils/inlineMetadata";
+import type Logger from "../dependencies/logger";
 
 export default class SelectScriptInterpreterCommand extends Command {
   activeFilePath: string;
@@ -9,6 +10,7 @@ export default class SelectScriptInterpreterCommand extends Command {
   projectRoot: string;
   interpreterManager: InterpreterManager;
   subcommandExecutor: SubcommandExecutor;
+  logger: Logger;
 
   constructor({
     activeFilePath,
@@ -16,12 +18,14 @@ export default class SelectScriptInterpreterCommand extends Command {
     projectRoot,
     interpreterManager,
     subcommandExecutor,
+    logger,
   }: {
     activeFilePath: string;
     uvBinaryPath: string;
     projectRoot: string;
     interpreterManager: InterpreterManager;
     subcommandExecutor: SubcommandExecutor;
+    logger: Logger;
   }) {
     super();
     this.activeFilePath = activeFilePath;
@@ -29,6 +33,7 @@ export default class SelectScriptInterpreterCommand extends Command {
     this.projectRoot = projectRoot;
     this.interpreterManager = interpreterManager;
     this.subcommandExecutor = subcommandExecutor;
+    this.logger = logger;
   }
 
   public async run(): Promise<void> {
@@ -40,20 +45,35 @@ export default class SelectScriptInterpreterCommand extends Command {
       throw new Error("The script has not a valid inline metadata.");
     }
 
-    await this.subcommandExecutor.execute(String(this.uvBinaryPath), [
+    const syncArgs = [
       "sync",
       "--directory",
       this.projectRoot,
       "--inexact",
       "--script",
       String(this.activeFilePath),
-    ]);
+    ];
 
+    this.logger.debug(
+      `Syncing dependencies with command: ${this.uvBinaryPath} ${syncArgs.join(" ")}`,
+    );
+    await this.subcommandExecutor.execute(this.uvBinaryPath, syncArgs);
+
+    const findArgs = [
+      "python",
+      "find",
+      "--script",
+      String(this.activeFilePath),
+    ];
+    this.logger.debug(
+      `Finding script interpreter with command: ${this.uvBinaryPath} ${findArgs.join(" ")}`,
+    );
     const inlineScriptInterpreterPath = await this.subcommandExecutor.execute(
       this.uvBinaryPath,
-      ["python", "find", "--script", String(this.activeFilePath)],
+      findArgs,
     );
 
+    this.logger.debug(`Selecting interpreter: ${inlineScriptInterpreterPath}`);
     await this.interpreterManager.select(inlineScriptInterpreterPath);
   }
 }
