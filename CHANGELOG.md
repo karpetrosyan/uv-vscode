@@ -1,3 +1,8 @@
+## [0.10.0] - 2025-09-13
+
+### 🚀 Features
+
+- Add logging with output channel
 ## [0.8.0] - 2025-09-08
 
 ### 🐛 Bug Fixes
