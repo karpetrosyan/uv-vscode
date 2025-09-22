@@ -35,6 +35,10 @@
       {
         "command": "uv-vscode.addDependency",
         "title": "Add Dependency"
+      },
+      {
+        "command": "uv-vscode.initScript",
+        "title": "Initialize Script"
       }
     ]
   },

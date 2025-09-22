@@ -16,6 +16,7 @@ import ExitScriptEnvironment from "./commands/exitScriptEnvironment";
 import ShellSubcommandExecutor from "./impl/subcommandExecutor";
 import { getActiveTextEditorFilePath, getProjectRoot } from "./utils/vscode_";
 import ExtensionLogger from "./impl/logger";
+import InitScriptCommand from "./commands/initScript";
 
 export async function activate(context: vscode.ExtensionContext) {
   const validateRepoOutputChannel = vscode.window.createOutputChannel("UV", {
@@ -31,7 +32,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
   const config: UvVscodeSettings = workspace.getConfiguration(
     "uv-vscode",
-    projectRoot
+    projectRoot,
   ) as UvVscodeSettings;
   logger.info(`Configuration loaded: ${JSON.stringify(config)}`);
 
@@ -48,14 +49,14 @@ export async function activate(context: vscode.ExtensionContext) {
       { scheme: "file", pattern: "**/*.py" },
       { scheme: "file", pattern: "**/*.toml" },
     ],
-    dependencyProvider
+    dependencyProvider,
   );
   logger.info("DependencyCodeLensProvider registered");
 
   const scriptProvider = new ScriptEnvironmentCodeLensProvider();
   vscode.languages.registerCodeLensProvider(
     { scheme: "file", language: "python" },
-    scriptProvider
+    scriptProvider,
   );
   logger.info("ScriptEnvironmentCodeLensProvider registered");
 
@@ -82,10 +83,10 @@ export async function activate(context: vscode.ExtensionContext) {
           interpreterManager: new VscodeApiInterpreterManager(pythonExtension),
           subcommandExecutor: new ShellSubcommandExecutor(logger),
           logger,
-        }
+        },
       );
       await selectScriptInterpreterCommand.run();
-    }
+    },
   );
 
   const exitScriptEnvironmentDisposable = vscode.commands.registerCommand(
@@ -93,10 +94,10 @@ export async function activate(context: vscode.ExtensionContext) {
     async () => {
       const command = new ExitScriptEnvironment(
         new VscodeApiInterpreterManager(pythonExtension),
-        logger
+        logger,
       );
       await command.run();
-    }
+    },
   );
 
   const addDependencyDisposable = vscode.commands.registerCommand(
@@ -111,7 +112,7 @@ export async function activate(context: vscode.ExtensionContext) {
         logger,
       });
       await command.run();
-    }
+    },
   );
   const removeDependencyDisposable = vscode.commands.registerCommand(
     "uv-vscode.removeDependency",
@@ -125,13 +126,33 @@ export async function activate(context: vscode.ExtensionContext) {
         logger,
       });
       await command.run();
-    }
+    },
+  );
+  const initScriptDisposable = vscode.commands.registerCommand(
+    "uv-vscode.initScript",
+    async () => {
+      const activeFilePath = getActiveTextEditorFilePath();
+
+      if (!activeFilePath) {
+        vscode.window.showErrorMessage("No active text editor found.");
+        return;
+      }
+
+      const command = new InitScriptCommand({
+        subcommandExecutor: new ShellSubcommandExecutor(logger),
+        uvBinaryPath,
+        logger,
+        activeFilePath,
+      });
+      await command.run();
+    },
   );
 
   context.subscriptions.push(selectScriptInterpreterDisposable);
   context.subscriptions.push(exitScriptEnvironmentDisposable);
   context.subscriptions.push(addDependencyDisposable);
   context.subscriptions.push(removeDependencyDisposable);
+  context.subscriptions.push(initScriptDisposable);
 }
 
 // This method is called when your extension is deactivated
