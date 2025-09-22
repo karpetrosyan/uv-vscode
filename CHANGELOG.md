@@ -1,3 +1,8 @@
+## [0.12.0] - 2025-09-22
+
+### 🚀 Features
+
+- Add initScript command
 ## [0.10.0] - 2025-09-13
 
 ### 🚀 Features
