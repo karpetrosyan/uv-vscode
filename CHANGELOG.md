@@ -1,3 +1,8 @@
+## [0.16.0] - 2025-09-23
+
+### 🚀 Features
+
+- Add `ignoreProjectConfigs` setting, true by default
 ## [0.12.0] - 2025-09-22
 
 ### 🚀 Features

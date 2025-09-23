@@ -3,7 +3,7 @@
   "displayName": "uv-vscode",
   "publisher": "karpetrosyan",
   "description": "",
-  "version": "0.14.0",
+  "version": "0.16.0",
   "engines": {
     "vscode": "^1.101.0"
   },
