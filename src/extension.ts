@@ -3,7 +3,7 @@
 import * as vscode from "vscode";
 import { workspace } from "vscode";
 import { findUvBinaryPath } from "./uv_binary";
-import { type UvVscodeSettings } from "./settings";
+import { DEFAULT_SETTINGS, type UvVscodeSettings } from "./settings";
 import { PythonExtension } from "@vscode/python-extension";
 import SelectScriptInterpreterCommand from "./commands/selectInlineScriptInterpreter";
 import VscodeApiInterpreterManager from "./impl/selectInterpreterCallback";
@@ -30,10 +30,10 @@ export async function activate(context: vscode.ExtensionContext) {
   const projectRoot = await getProjectRoot();
   logger.info(`Project root: ${projectRoot.uri.fsPath}`);
 
-  const config: UvVscodeSettings = workspace.getConfiguration(
-    "uv-vscode",
-    projectRoot,
-  ) as UvVscodeSettings;
+  const config: UvVscodeSettings = {
+    ...DEFAULT_SETTINGS,
+    ...workspace.getConfiguration("uv-vscode", projectRoot),
+  } as UvVscodeSettings;
   logger.info(`Configuration loaded: ${JSON.stringify(config)}`);
 
   const uvBinaryPath = await findUvBinaryPath({ settings: config });
@@ -81,7 +81,7 @@ export async function activate(context: vscode.ExtensionContext) {
           uvBinaryPath,
           projectRoot: projectRoot.uri.fsPath,
           interpreterManager: new VscodeApiInterpreterManager(pythonExtension),
-          subcommandExecutor: new ShellSubcommandExecutor(logger),
+          subcommandExecutor: new ShellSubcommandExecutor(logger, config),
           logger,
         },
       );
@@ -105,7 +105,7 @@ export async function activate(context: vscode.ExtensionContext) {
     async () => {
       const command = new AddDependencyCommand({
         inputRequester: new VscodeApiInputRequest(),
-        subcommandExecutor: new ShellSubcommandExecutor(logger),
+        subcommandExecutor: new ShellSubcommandExecutor(logger, config),
         projectRoot: projectRoot.uri.fsPath,
         uvBinaryPath,
         activeFilePath: getActiveTextEditorFilePath(),
@@ -119,7 +119,7 @@ export async function activate(context: vscode.ExtensionContext) {
     async () => {
       const command = new RemoveDependencyCommand({
         inputRequester: new VscodeApiInputRequest(),
-        subcommandExecutor: new ShellSubcommandExecutor(logger),
+        subcommandExecutor: new ShellSubcommandExecutor(logger, config),
         projectRoot: projectRoot.uri.fsPath,
         uvBinaryPath,
         activeFilePath: getActiveTextEditorFilePath(),
@@ -139,7 +139,7 @@ export async function activate(context: vscode.ExtensionContext) {
       }
 
       const command = new InitScriptCommand({
-        subcommandExecutor: new ShellSubcommandExecutor(logger),
+        subcommandExecutor: new ShellSubcommandExecutor(logger, config),
         uvBinaryPath,
         logger,
         activeFilePath,

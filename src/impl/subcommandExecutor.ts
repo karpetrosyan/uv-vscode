@@ -1,11 +1,19 @@
 import type Logger from "../dependencies/logger";
 import type SubcommandExecutor from "../dependencies/subcommandExecutor";
+import type { UvVscodeSettings } from "../settings";
 import { executeFile } from "../utils/subprocess";
 
 export default class ShellSubcommandExecutor implements SubcommandExecutor {
-  constructor(private readonly logger: Logger) {}
+  constructor(
+    private readonly logger: Logger,
+    private readonly config: UvVscodeSettings,
+  ) {}
 
   async execute(command: string, args: string[]): Promise<string> {
+    if (command.endsWith("uv") && this.config.ignoreProjectConfigs) {
+      args.push("--no-config");
+    }
+
     try {
       return await executeFile(command, args);
     } catch (error) {
