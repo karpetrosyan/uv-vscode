@@ -3,7 +3,7 @@
   "displayName": "uv",
   "publisher": "karpetrosyan",
   "description": "",
-  "version": "0.16.0",
+  "version": "0.18.0",
   "engines": {
     "vscode": "^1.101.0"
   },
@@ -20,7 +20,7 @@
   "main": "./dist/extension.js",
   "contributes": {
     "configuration": {
-      "title": "uv configuration",
+      "title": "Uv",
       "properties": {
         "uv.noConfigForScripts": {
           "type": "boolean",
@@ -32,27 +32,27 @@
     "commands": [
       {
         "command": "uv-vscode.selectScriptInterpreter",
-        "category": "uv",
+        "category": "Uv",
         "title": "Select Script Interpreter"
       },
       {
         "command": "uv-vscode.exitScriptEnvironment",
-        "category": "uv",
+        "category": "Uv",
         "title": "Exit Script Environment"
       },
       {
         "command": "uv-vscode.removeDependency",
-        "category": "uv",
+        "category": "Uv",
         "title": "Remove Dependency"
       },
       {
         "command": "uv-vscode.addDependency",
-        "category": "uv",
+        "category": "Uv",
         "title": "Add Dependency"
       },
       {
         "command": "uv-vscode.initScript",
-        "category": "uv",
+        "category": "Uv",
         "title": "Initialize Script"
       }
     ]

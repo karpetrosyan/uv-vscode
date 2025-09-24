@@ -1,3 +1,8 @@
+## [0.18.0] - 2025-09-24
+
+### 🚀 Features
+
+- Add configuration properties to package.json
 ## [0.16.0] - 2025-09-23
 
 ### 🚀 Features
