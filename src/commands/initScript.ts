@@ -36,6 +36,6 @@ export default class InitScriptCommand extends Command {
       `Initializing script with command: ${this.uvBinaryPath} ${args.join(" ")}`,
     );
 
-    await this.subcommandExecutor.execute(this.uvBinaryPath, args);
+    await this.subcommandExecutor.execute(this.uvBinaryPath, args, true);
   }
 }

@@ -1,9 +1,7 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode";
-import { workspace } from "vscode";
 import { findUvBinaryPath } from "./uv_binary";
-import { DEFAULT_SETTINGS, type UvVscodeSettings } from "./settings";
 import { PythonExtension } from "@vscode/python-extension";
 import SelectScriptInterpreterCommand from "./commands/selectInlineScriptInterpreter";
 import VscodeApiInterpreterManager from "./impl/selectInterpreterCallback";
@@ -17,11 +15,15 @@ import ShellSubcommandExecutor from "./impl/subcommandExecutor";
 import { getActiveTextEditorFilePath, getProjectRoot } from "./utils/vscode_";
 import ExtensionLogger from "./impl/logger";
 import InitScriptCommand from "./commands/initScript";
+import { getUvVscodeSettings } from "./settings";
 
 export async function activate(context: vscode.ExtensionContext) {
   const validateRepoOutputChannel = vscode.window.createOutputChannel("UV", {
     log: true,
   });
+
+  const pythonExtension = await PythonExtension.api();
+  await pythonExtension.ready;
 
   // We need a wrapper logger to isolate commands from the infrastructure (vscode api)
   const logger = new ExtensionLogger(validateRepoOutputChannel);
@@ -30,17 +32,12 @@ export async function activate(context: vscode.ExtensionContext) {
   const projectRoot = await getProjectRoot();
   logger.info(`Project root: ${projectRoot.uri.fsPath}`);
 
-  const config: UvVscodeSettings = {
-    ...DEFAULT_SETTINGS,
-    ...workspace.getConfiguration("uv-vscode", projectRoot),
-  } as UvVscodeSettings;
+  let config = getUvVscodeSettings();
+
   logger.info(`Configuration loaded: ${JSON.stringify(config)}`);
 
-  const uvBinaryPath = await findUvBinaryPath({ settings: config });
+  let uvBinaryPath = await findUvBinaryPath({ settings: config });
   logger.info(`Using uv binary at path: ${uvBinaryPath}`);
-
-  const pythonExtension = await PythonExtension.api();
-  await pythonExtension.ready;
 
   const dependencyProvider = new DependencyCodeLensProvider();
 
@@ -148,6 +145,16 @@ export async function activate(context: vscode.ExtensionContext) {
     },
   );
 
+  context.subscriptions.push(
+    vscode.workspace.onDidChangeConfiguration(
+      async (e: vscode.ConfigurationChangeEvent) => {
+        if (e.affectsConfiguration("uv")) {
+          config = getUvVscodeSettings();
+          uvBinaryPath = await findUvBinaryPath({ settings: config });
+        }
+      },
+    ),
+  );
   context.subscriptions.push(selectScriptInterpreterDisposable);
   context.subscriptions.push(exitScriptEnvironmentDisposable);
   context.subscriptions.push(addDependencyDisposable);

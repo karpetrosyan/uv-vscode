@@ -9,8 +9,12 @@ export default class ShellSubcommandExecutor implements SubcommandExecutor {
     private readonly config: UvVscodeSettings,
   ) {}
 
-  async execute(command: string, args: string[]): Promise<string> {
-    if (command.endsWith("uv") && this.config.ignoreProjectConfigs) {
+  async execute(
+    command: string,
+    args: string[],
+    isScript: boolean,
+  ): Promise<string> {
+    if (command.endsWith("uv") && isScript && this.config.noConfigForScripts) {
       args.push("--no-config");
     }
 

@@ -57,7 +57,11 @@ export default class SelectScriptInterpreterCommand extends Command {
     this.logger.debug(
       `Syncing dependencies with command: ${this.uvBinaryPath} ${syncArgs.join(" ")}`,
     );
-    await this.subcommandExecutor.execute(this.uvBinaryPath, syncArgs);
+    await this.subcommandExecutor.execute(
+      this.uvBinaryPath,
+      syncArgs,
+      isScript,
+    );
 
     const findArgs = [
       "python",
@@ -71,6 +75,7 @@ export default class SelectScriptInterpreterCommand extends Command {
     const inlineScriptInterpreterPath = await this.subcommandExecutor.execute(
       this.uvBinaryPath,
       findArgs,
+      isScript,
     );
 
     this.logger.debug(`Selecting interpreter: ${inlineScriptInterpreterPath}`);

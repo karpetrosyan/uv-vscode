@@ -71,7 +71,7 @@ export default class AddDependencyCommand extends Command {
     this.logger.debug(
       `Adding dependency with command: ${this.uvBinaryPath} ${addArgs.join(" ")}`,
     );
-    await this.subcommandExecutor.execute(this.uvBinaryPath, addArgs);
+    await this.subcommandExecutor.execute(this.uvBinaryPath, addArgs, isScript);
 
     const syncArgs = [
       "sync",
@@ -84,6 +84,10 @@ export default class AddDependencyCommand extends Command {
     this.logger.debug(
       `Syncing dependencies with command: ${this.uvBinaryPath} ${syncArgs.join(" ")}`,
     );
-    await this.subcommandExecutor.execute(this.uvBinaryPath, syncArgs);
+    await this.subcommandExecutor.execute(
+      this.uvBinaryPath,
+      syncArgs,
+      isScript,
+    );
   }
 }

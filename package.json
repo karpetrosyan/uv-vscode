@@ -1,6 +1,6 @@
 {
   "name": "uv-vscode",
-  "displayName": "uv-vscode",
+  "displayName": "uv",
   "publisher": "karpetrosyan",
   "description": "",
   "version": "0.16.0",
@@ -19,25 +19,40 @@
   },
   "main": "./dist/extension.js",
   "contributes": {
+    "configuration": {
+      "title": "uv configuration",
+      "properties": {
+        "uv.noConfigForScripts": {
+          "type": "boolean",
+          "default": true,
+          "description": "If true, uv will ignore configurations when running PEP 723 compatible scripts."
+        }
+      }
+    },
     "commands": [
       {
         "command": "uv-vscode.selectScriptInterpreter",
+        "category": "uv",
         "title": "Select Script Interpreter"
       },
       {
         "command": "uv-vscode.exitScriptEnvironment",
+        "category": "uv",
         "title": "Exit Script Environment"
       },
       {
         "command": "uv-vscode.removeDependency",
+        "category": "uv",
         "title": "Remove Dependency"
       },
       {
         "command": "uv-vscode.addDependency",
+        "category": "uv",
         "title": "Add Dependency"
       },
       {
         "command": "uv-vscode.initScript",
+        "category": "uv",
         "title": "Initialize Script"
       }
     ]

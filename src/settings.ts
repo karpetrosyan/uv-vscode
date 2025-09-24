@@ -1,8 +1,12 @@
+import vscode from "vscode";
+
 export type UvVscodeSettings = {
-  path?: string[];
-  ignoreProjectConfigs?: boolean;
+  noConfigForScripts: boolean;
 };
 
-export const DEFAULT_SETTINGS: UvVscodeSettings = {
-  ignoreProjectConfigs: true,
-};
+export function getUvVscodeSettings(): UvVscodeSettings {
+  const config = vscode.workspace.getConfiguration("uv");
+  return {
+    noConfigForScripts: config.get<boolean>("noConfigForScripts")!,
+  };
+}

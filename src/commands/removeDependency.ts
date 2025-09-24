@@ -69,6 +69,7 @@ export default class RemoveDependencyCommand extends Command {
     await this.subcommandExecutor.execute(
       String(this.uvBinaryPath),
       removeArgs,
+      isScript,
     );
 
     const syncArgs = [
@@ -81,6 +82,10 @@ export default class RemoveDependencyCommand extends Command {
     this.logger.debug(
       `Syncing dependencies with command: ${this.uvBinaryPath} ${syncArgs.join(" ")}`,
     );
-    await this.subcommandExecutor.execute(String(this.uvBinaryPath), syncArgs);
+    await this.subcommandExecutor.execute(
+      String(this.uvBinaryPath),
+      syncArgs,
+      isScript,
+    );
   }
 }

@@ -1,6 +1,5 @@
 import * as vscode from "vscode";
 import { BUNDLED_UV_EXECUTABLE } from "./constants";
-import * as fsapi from "fs-extra";
 import { platform } from "os";
 import { type UvVscodeSettings } from "./settings";
 
@@ -20,13 +19,14 @@ export async function findUvBinaryPath({
     return BUNDLED_UV_EXECUTABLE;
   }
 
-  if (Array.isArray(settings.path) && settings.path.length > 0) {
-    for (const path of settings.path) {
-      if (await fsapi.pathExists(path)) {
-        return path;
-      }
-    }
-  }
+  console.log("Finding uv binary path...", settings);
+  // if (Array.isArray(settings.path) && settings.path.length > 0) {
+  //   for (const path of settings.path) {
+  //     if (await fsapi.pathExists(path)) {
+  //       return path;
+  //     }
+  //   }
+  // }
 
   return BUNDLED_UV_EXECUTABLE;
 }
