@@ -1,12 +1,17 @@
 {
   "name": "uv-vscode",
-  "displayName": "uv",
+  "displayName": "uv-code",
   "publisher": "karpetrosyan",
   "description": "",
   "version": "0.18.0",
   "engines": {
     "vscode": "^1.101.0"
   },
+  "keywords": [
+    "python",
+    "package-management",
+    "uv"
+  ],
   "categories": [
     "Other"
   ],
