@@ -72,11 +72,17 @@ export default class SelectScriptInterpreterCommand extends Command {
     this.logger.debug(
       `Finding script interpreter with command: ${this.uvBinaryPath} ${findArgs.join(" ")}`,
     );
-    const inlineScriptInterpreterPath = await this.subcommandExecutor.execute(
+    let inlineScriptInterpreterPath = await this.subcommandExecutor.execute(
       this.uvBinaryPath,
       findArgs,
       isScript,
     );
+
+    if (process.platform === "win32") {
+      // On Windows, the returned path might include a newline character at the end.
+      // We need to trim it to get the correct path.
+      inlineScriptInterpreterPath = inlineScriptInterpreterPath.trim();
+    }
 
     this.logger.debug(`Selecting interpreter: ${inlineScriptInterpreterPath}`);
     await this.interpreterManager.select(inlineScriptInterpreterPath);
