@@ -23,7 +23,6 @@ export async function activate(context: vscode.ExtensionContext) {
   });
 
   const pythonExtension = await PythonExtension.api();
-  await pythonExtension.ready;
 
   // We need a wrapper logger to isolate commands from the infrastructure (vscode api)
   const logger = new ExtensionLogger(validateRepoOutputChannel);
