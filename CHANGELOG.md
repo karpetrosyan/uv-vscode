@@ -1,3 +1,13 @@
+## [0.22.0] - 2025-09-27
+
+### 🐛 Bug Fixes
+
+- Extension activation for windows
+## [0.20.0] - 2025-09-27
+
+### ⚙️ Miscellaneous Tasks
+
+- Fix display name, add more keywords
 ## [0.18.0] - 2025-09-24
 
 ### 🚀 Features
