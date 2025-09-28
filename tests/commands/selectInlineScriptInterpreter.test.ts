@@ -8,6 +8,9 @@ import {
 import SelectScriptInterpreterCommand from "../../src/commands/selectInlineScriptInterpreter";
 import { join } from "node:path";
 import { writeFileSync } from "node:fs";
+import { SCRIPTS_ENV_DIR } from "../../src/constants";
+
+const getScriptPath = (fileName: string) => join(SCRIPTS_ENV_DIR, fileName);
 
 test("SelectScriptInterpreter with non-script file", async () => {
   const subcommandExecutor = new FakeSubcommandExecutor();
@@ -16,18 +19,21 @@ test("SelectScriptInterpreter with non-script file", async () => {
   withTempDir(async (dir) => {
     writeFileSync(join(dir, "script.py"), "print(10");
     const logger = new FakeLogger();
-    const command = new SelectScriptInterpreterCommand({
-      activeFilePath: join(dir, "script.py"),
-      uvBinaryPath: "/uv",
-      projectRoot: "/project",
-      interpreterManager: interpreterManager,
-      subcommandExecutor: subcommandExecutor,
-      logger: logger,
-    });
-
-    await expect(command.run()).rejects.toThrowError(
-      "The script has not a valid inline metadata.",
+    const config = {
+      noConfigForScripts: true,
+      autoSelectInterpreterForScripts: true,
+    };
+    const command = new SelectScriptInterpreterCommand(
+      join(dir, "script.py"),
+      "/uv",
+      "/project",
+      interpreterManager,
+      subcommandExecutor,
+      logger,
+      config,
     );
+
+    await expect(command.run()).resolves.toStrictEqual(false);
     expect(logger.collectedLogs).toMatchInlineSnapshot(`[]`);
   });
 });
@@ -44,14 +50,19 @@ test("SelectScriptInterpreter with script file", async () => {
 `;
     writeFileSync(join(dir, "script.py"), pythonInline);
     const logger = new FakeLogger();
-    const command = new SelectScriptInterpreterCommand({
-      activeFilePath: join(dir, "script.py"),
-      uvBinaryPath: "/uv",
-      projectRoot: "/project",
-      interpreterManager: interpreterManager,
-      subcommandExecutor: subcommandExecutor,
+    const config = {
+      noConfigForScripts: true,
+      autoSelectInterpreterForScripts: true,
+    };
+    const command = new SelectScriptInterpreterCommand(
+      join(dir, "script.py"),
+      "/uv",
+      "/project",
+      interpreterManager,
+      subcommandExecutor,
       logger,
-    });
+      config,
+    );
     await command.run();
   });
 
@@ -66,11 +77,12 @@ test("SelectScriptInterpreter with script file", async () => {
 test("SelectScriptInterpreter multiple times", async () => {
   const subcommandExecutor = new FakeSubcommandExecutor([
     "sync-ok",
-    "some/path",
+    getScriptPath("script1.py"),
     "sync-ok",
-    "some/path",
+    getScriptPath("script2.py"),
   ]);
   const interpreterManager = new FakeInterpreterManager();
+  interpreterManager.currentInterpreterPath = "some/path";
 
   await withTempDir(async (dir) => {
     const pythonInline = `
@@ -80,23 +92,28 @@ test("SelectScriptInterpreter multiple times", async () => {
 `;
     writeFileSync(join(dir, "script.py"), pythonInline);
     const logger = new FakeLogger();
-    const command = new SelectScriptInterpreterCommand({
-      activeFilePath: join(dir, "script.py"),
-      uvBinaryPath: "/uv",
-      projectRoot: "/project",
-      interpreterManager: interpreterManager,
-      subcommandExecutor: subcommandExecutor,
+    const config = {
+      noConfigForScripts: true,
+      autoSelectInterpreterForScripts: true,
+    };
+    const command = new SelectScriptInterpreterCommand(
+      join(dir, "script.py"),
+      "/uv",
+      "/project",
+      interpreterManager,
+      subcommandExecutor,
       logger,
-    });
+      config,
+    );
 
     await command.run();
     await command.run();
   });
 
-  expect(interpreterManager.currentInterpreterPath).toMatchInlineSnapshot(
-    `"some/path"`,
-  );
+  expect(
+    interpreterManager.currentInterpreterPath?.endsWith("script2.py"),
+  ).toBe(true);
   expect(interpreterManager.previousInterpreterPath).toMatchInlineSnapshot(
-    `undefined`,
+    `"some/path"`,
   );
 });

@@ -5,6 +5,7 @@ import type InputRequester from "../src/dependencies/inputRequester";
 import type InterpreterManager from "../src/dependencies/interpreterManager";
 import type SubcommandExecutor from "../src/dependencies/subcommandExecutor";
 import type Logger from "../src/dependencies/logger";
+import { SCRIPTS_ENV_DIR } from "../src/constants";
 
 export class FakeInputRequester implements InputRequester {
   constructor(public responses: (string | undefined)[]) {}
@@ -33,7 +34,7 @@ export class FakeInterpreterManager implements InterpreterManager {
   ) {}
 
   async select(interpreterPath: string): Promise<void> {
-    if (this.currentInterpreterPath !== interpreterPath) {
+    if (!this.currentInterpreterPath?.startsWith(SCRIPTS_ENV_DIR)) {
       this.previousInterpreterPath = this.currentInterpreterPath;
     }
     this.currentInterpreterPath = interpreterPath;

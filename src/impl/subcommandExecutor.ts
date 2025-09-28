@@ -1,4 +1,3 @@
-import { UV_BINARY_NAME } from "../constants";
 import type Logger from "../dependencies/logger";
 import type SubcommandExecutor from "../dependencies/subcommandExecutor";
 import type { UvVscodeSettings } from "../settings";
@@ -10,19 +9,7 @@ export default class ShellSubcommandExecutor implements SubcommandExecutor {
     private readonly config: UvVscodeSettings,
   ) {}
 
-  async execute(
-    command: string,
-    args: string[],
-    isScript: boolean,
-  ): Promise<string> {
-    if (
-      command.endsWith(UV_BINARY_NAME) &&
-      isScript &&
-      this.config.noConfigForScripts
-    ) {
-      args.push("--no-config");
-    }
-
+  async execute(command: string, args: string[]): Promise<string> {
     try {
       return await executeFile(command, args);
     } catch (error) {

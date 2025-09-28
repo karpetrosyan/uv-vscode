@@ -31,20 +31,15 @@
           "type": "boolean",
           "default": true,
           "description": "If true, uv will ignore configurations when running PEP 723 compatible scripts."
+        },
+        "uv.autoSelectInterpreterForScripts": {
+          "type": "boolean",
+          "default": true,
+          "description": "If true, uv will automatically select the appropriate Python interpreter for PEP 723 compatible scripts."
         }
       }
     },
     "commands": [
-      {
-        "command": "uv-vscode.selectScriptInterpreter",
-        "category": "Uv",
-        "title": "Select Script Interpreter"
-      },
-      {
-        "command": "uv-vscode.exitScriptEnvironment",
-        "category": "Uv",
-        "title": "Exit Script Environment"
-      },
       {
         "command": "uv-vscode.removeDependency",
         "category": "Uv",
@@ -59,6 +54,11 @@
         "command": "uv-vscode.initScript",
         "category": "Uv",
         "title": "Initialize Script"
+      },
+      {
+        "command": "uv-vscode.showLogs",
+        "category": "Uv",
+        "title": "Show Logs"
       }
     ]
   },
@@ -80,7 +80,10 @@
     "check": "eslint src tests && prettier --check src tests",
     "fix": "eslint --fix src tests && prettier --write src tests",
     "test": "vitest",
-    "tsc": "tsc"
+    "tsc": "tsc",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs"
   },
   "devDependencies": {
     "@eslint/js": "^9.34.0",
@@ -102,6 +105,7 @@
     "prettier": "^3.6.2",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.39.0",
+    "vitepress": "^2.0.0-alpha.12",
     "vitest": "^3.2.4"
   },
   "dependencies": {

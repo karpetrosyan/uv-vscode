@@ -1,4 +1,5 @@
 import path from "path";
+import os from "os";
 
 export const EXTENSION_ROOT_DIR = path.dirname(__dirname);
 
@@ -15,3 +16,15 @@ export const BUNDLED_UV_EXECUTABLE = path.join(
   "bin",
   UV_BINARY_NAME,
 );
+
+export const SCRIPTS_ENV_DIR =
+  process.platform === "win32"
+    ? path.join(
+        os.homedir(),
+        "AppData",
+        "Local",
+        "uv",
+        "cache",
+        "environments-v2",
+      )
+    : path.join(os.homedir(), ".cache", "uv", "environments-v2");

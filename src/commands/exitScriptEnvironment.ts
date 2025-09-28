@@ -6,13 +6,11 @@ import type Logger from "../dependencies/logger";
  * Exits the current virtual environment by restoring the last known interpreter.
  */
 export default class ExitScriptEnvironment extends Command {
-  interpreterManager: InterpreterManager;
-  logger: Logger;
-
-  constructor(interpreterManager: InterpreterManager, logger: Logger) {
+  constructor(
+    public interpreterManager: InterpreterManager,
+    public logger: Logger,
+  ) {
     super();
-    this.interpreterManager = interpreterManager;
-    this.logger = logger;
   }
 
   public async run(): Promise<void> {

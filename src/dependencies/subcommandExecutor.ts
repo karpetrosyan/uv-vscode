@@ -1,3 +1,3 @@
 export default interface SubcommandExecutor {
-  execute(command: string, args: string[], isScript: boolean): Promise<string>;
+  execute(command: string, args: string[]): Promise<string>;
 }

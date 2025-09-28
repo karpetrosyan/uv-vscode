@@ -1,3 +1,3 @@
-export default abstract class Command {
-  public abstract run(): Promise<void>;
+export default abstract class Command<T = void> {
+  public abstract run(): Promise<T>;
 }
