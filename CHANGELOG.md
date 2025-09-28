@@ -1,39 +1,60 @@
+## [0.24.0] - 2025-09-28
+
+### 🐛 Bug Fixes
+
+- Script interpreter path finding in windows
+
+### 🚀 Features
+
+- Add `uv.autoSelectInterpreterForScripts` setting
+- Add `uv-vscode.showLogs` command
+
+### 🚜 Refactor
+
+- Remove enter/exit code lenses, automatically switch between interpreters
+
 ## [0.22.0] - 2025-09-27
 
 ### 🐛 Bug Fixes
 
 - Extension activation for windows
+
 ## [0.20.0] - 2025-09-27
 
 ### ⚙️ Miscellaneous Tasks
 
 - Fix display name, add more keywords
+
 ## [0.18.0] - 2025-09-24
 
 ### 🚀 Features
 
 - Add configuration properties to package.json
+
 ## [0.16.0] - 2025-09-23
 
 ### 🚀 Features
 
 - Add `ignoreProjectConfigs` setting, true by default
+
 ## [0.12.0] - 2025-09-22
 
 ### 🚀 Features
 
 - Add initScript command
+
 ## [0.10.0] - 2025-09-13
 
 ### 🚀 Features
 
 - Add logging with output channel
+
 ## [0.8.0] - 2025-09-08
 
 ### 🐛 Bug Fixes
 
-- *(docs)* Fix readme
-- *(docs)* Fix links to the gifs
+- _(docs)_ Fix readme
+- _(docs)_ Fix links to the gifs
 
 ### 📚 Documentation
 
@@ -43,16 +64,19 @@
 
 - Fix gif paths
 - Format with prettier when fixing lint errors
+
 ## [0.6.0] - 2025-09-08
 
 ### 🚀 Features
 
 - Don't overwrite previous interpreter with the same one
+
 ## [0.4.0] - 2025-09-08
 
 ### 🐛 Bug Fixes
 
 - Extension importing
+
 ## [0.2.0] - 2025-09-08
 
 ### ⚙️ Miscellaneous Tasks
