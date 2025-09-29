@@ -4,6 +4,7 @@ import { defineConfig } from "vitepress";
 export default defineConfig({
   title: "uv-vscode",
   description: "A VitePress Site",
+  base: "/uv-vscode/",
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [{ text: "Features", link: "/features/scripts" }],
