@@ -3,7 +3,6 @@ import { defineConfig } from "vitepress";
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
   title: "uv-vscode",
-  description: "A VitePress Site",
   base: "/uv-vscode/",
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
