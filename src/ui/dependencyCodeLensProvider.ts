@@ -16,7 +16,7 @@ export default class DependencyCodeLensProvider implements CodeLensProvider {
   }
   provideCodeLenses(document: TextDocument): CodeLens[] {
     const codeLenses: CodeLens[] = [];
-    const isTomlFile = document.languageId === "toml";
+    const isTomlFile = document.fileName.endsWith(".toml");
     let state = IdleState({
       inlineMetadataFromScript: !isTomlFile,
     }) as State;
