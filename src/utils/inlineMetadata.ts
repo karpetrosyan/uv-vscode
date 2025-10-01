@@ -178,7 +178,7 @@ const processLineForToml = (
     return state;
   }
 
-  if (line.text.trim().startsWith("dependencies = [")) {
+  if (line.text.trim().split("=")[0]?.trim() === "dependencies") {
     state.dependenciesLine = line.lineNumber;
     return ParsedState(state.settings, state);
   }
