@@ -15,10 +15,7 @@ export async function findUvBinaryPath({
 }: {
   settings: UvVscodeSettings;
 }) {
-  if (!vscode.workspace.isTrusted) {
-    return BUNDLED_UV_EXECUTABLE;
-  }
-
+  // TODO: maybe also take it from the venv?
   console.log("Finding uv binary path...", settings);
   // if (Array.isArray(settings.path) && settings.path.length > 0) {
   //   for (const path of settings.path) {
