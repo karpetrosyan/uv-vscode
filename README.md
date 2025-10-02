@@ -10,7 +10,7 @@ Go through the [documentation](https://karpetrosyan.github.io/uv-vscode/) to get
 
 ### Automatically enters the script environment when the active editor is a script
 
-When you change your active text editor in `VS Code` to a file that is `PEP 723` compatible script, you will get a full LSP support, autocomplections, because the extension will automatically create, enter to the python environment, installing all the dependencies defined in a file
+When you change your active text editor in `VS Code` to a file that is `PEP 723` compatible script, you will get a full LSP support because the extension will automatically create, enter to the python environment, installing all the dependencies defined in a file
 
 ![Automatically enters the script environment when the active editor is a script](https://raw.githubusercontent.com/karpetrosyan/uv-vscode/main/docs/public/change-environments.gif#gh-light-mode-only)
 ![Automatically enters the script environment when the active editor is a script](https://raw.githubusercontent.com/karpetrosyan/uv-vscode/main/docs/public/change-environments-dark.gif#gh-dark-mode-only)
