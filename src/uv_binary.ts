@@ -1,4 +1,3 @@
-import * as vscode from "vscode";
 import { BUNDLED_UV_EXECUTABLE } from "./constants";
 import { platform } from "os";
 import { type UvVscodeSettings } from "./settings";

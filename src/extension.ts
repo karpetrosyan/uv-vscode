@@ -158,6 +158,15 @@ export async function activate(context: vscode.ExtensionContext) {
         activeFilePath,
         logger,
         config,
+        new SelectScriptInterpreterCommand(
+          activeFilePath,
+          uvBinaryPath,
+          projectRoot.uri.fsPath,
+          new VscodeApiInterpreterManager(pythonExtension),
+          new ShellSubcommandExecutor(logger, config),
+          logger,
+          config,
+        ),
       );
       await command.run();
     }),
