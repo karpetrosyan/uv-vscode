@@ -56,6 +56,14 @@ export default defineConfig({
               link: "/commands/sync.md",
             },
             {
+              text: "Lock",
+              link: "/commands/lock.md",
+            },
+            {
+              text: "Venv",
+              link: "/commands/venv.md",
+            },
+            {
               text: "Initialize Project",
               link: "/commands/init.md",
             },

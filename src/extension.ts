@@ -160,6 +160,21 @@ export async function activate(context: vscode.ExtensionContext) {
       );
       await command.run();
     }),
+
+    // venv
+    vscode.commands.registerCommand("uv-vscode.venv", async () => {
+      const command = new UvCliImpl(
+        "venv",
+        new VscodeApiInputRequest(),
+        new ShellSubcommandExecutor(logger),
+        projectRoot.uri.fsPath,
+        uvBinaryPath,
+        logger,
+        config,
+        getActiveTextEditorFilePath(),
+      );
+      await command.run();
+    }),
   );
 
   context.subscriptions.push(

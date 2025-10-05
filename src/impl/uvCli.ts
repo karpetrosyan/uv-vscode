@@ -103,6 +103,7 @@ export default class UvCliImpl<T extends UvCommand> implements UvCli<T> {
       case "remove":
       case "sync":
       case "lock":
+      case "venv":
       case "init": {
         await this.subcommandExecutor.execute(this.uvBinaryPath, args);
         break;

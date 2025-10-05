@@ -70,6 +70,11 @@
         "category": "Uv",
         "title": "Lock dependencies"
       },
+        {
+        "command": "uv-vscode.venv",
+        "category": "Uv",
+        "title": "Create Virtual Environment"
+      },
       {
         "command": "uv-vscode.showLogs",
         "category": "Uv",
