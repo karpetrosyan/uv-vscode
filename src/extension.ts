@@ -16,6 +16,7 @@ import ExtensionLogger from "./impl/logger";
 import InitScriptCommand from "./commands/initScript";
 import { getUvVscodeSettings } from "./settings";
 import UvCliImpl from "./impl/uvCli";
+import VsCodeTerminalSender from "./impl/terminalSender";
 
 export async function activate(context: vscode.ExtensionContext) {
   const validateRepoOutputChannel = vscode.window.createOutputChannel("UV", {
@@ -97,6 +98,7 @@ export async function activate(context: vscode.ExtensionContext) {
         uvBinaryPath,
         logger,
         config,
+        new VsCodeTerminalSender(),
         getActiveTextEditorFilePath(),
       );
       await command.run();
@@ -111,6 +113,7 @@ export async function activate(context: vscode.ExtensionContext) {
         uvBinaryPath,
         logger,
         config,
+        new VsCodeTerminalSender(),
         getActiveTextEditorFilePath(),
       );
       await command.run();
@@ -126,6 +129,7 @@ export async function activate(context: vscode.ExtensionContext) {
         uvBinaryPath,
         logger,
         config,
+        new VsCodeTerminalSender(),
         getActiveTextEditorFilePath(),
       );
       await command.run();
@@ -141,6 +145,7 @@ export async function activate(context: vscode.ExtensionContext) {
         uvBinaryPath,
         logger,
         config,
+        new VsCodeTerminalSender(),
         getActiveTextEditorFilePath(),
       );
       await command.run();
@@ -156,6 +161,7 @@ export async function activate(context: vscode.ExtensionContext) {
         uvBinaryPath,
         logger,
         config,
+        new VsCodeTerminalSender(),
         getActiveTextEditorFilePath(),
       );
       await command.run();
@@ -171,6 +177,7 @@ export async function activate(context: vscode.ExtensionContext) {
         uvBinaryPath,
         logger,
         config,
+        new VsCodeTerminalSender(),
         getActiveTextEditorFilePath(),
       );
       await command.run();
@@ -224,6 +231,7 @@ export async function activate(context: vscode.ExtensionContext) {
           uvBinaryPath,
           logger,
           config,
+          new VsCodeTerminalSender(),
           getActiveTextEditorFilePath(),
         ),
         new SelectScriptInterpreterCommand(

@@ -27,10 +27,10 @@
     "configuration": {
       "title": "Uv",
       "properties": {
-        "uv.noConfigForScripts": {
+        "uv.sentUvCommandToTerminal": {
           "type": "boolean",
-          "default": true,
-          "description": "If true, uv will ignore configurations when running PEP 723 compatible scripts."
+          "default": false,
+          "description": "When enabled, the UV command will be sent to the terminal instead of being executed directly."
         },
         "uv.autoSelectInterpreterForScripts": {
           "type": "boolean",
