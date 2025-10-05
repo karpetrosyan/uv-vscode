@@ -1,16 +1,13 @@
 import type Logger from "../dependencies/logger";
 import type SubcommandExecutor from "../dependencies/subcommandExecutor";
-import type { UvVscodeSettings } from "../settings";
 import { executeFile } from "../utils/subprocess";
 
 export default class ShellSubcommandExecutor implements SubcommandExecutor {
-  constructor(
-    private readonly logger: Logger,
-    private readonly config: UvVscodeSettings,
-  ) {}
+  constructor(private readonly logger: Logger) {}
 
   async execute(command: string, args: string[]): Promise<string> {
     try {
+      this.logger.info(`Executing command: ${command} ${args.join(" ")}`);
       return await executeFile(command, args);
     } catch (error) {
       const commandInfo = `${command} ${args.join(" ")}`;

@@ -19,3 +19,11 @@ export default class VscodeApiInputRequest implements InputRequester {
     });
   }
 }
+
+export class PredefinedInputRequester implements InputRequester {
+  constructor(private predefinedInput: string | undefined) {}
+
+  askForInput(): Promise<string | undefined> {
+    return Promise.resolve(this.predefinedInput);
+  }
+}

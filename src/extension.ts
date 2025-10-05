@@ -5,18 +5,17 @@ import { findUvBinaryPath } from "./uv_binary";
 import { PythonExtension } from "@vscode/python-extension";
 import SelectScriptInterpreterCommand from "./commands/selectInlineScriptInterpreter";
 import VscodeApiInterpreterManager from "./impl/selectInterpreterCallback";
-import AddDependencyCommand from "./commands/add";
-import VscodeApiInputRequest from "./impl/inputRequester";
+import VscodeApiInputRequest, {
+  PredefinedInputRequester,
+} from "./impl/inputRequester";
 import DependencyCodeLensProvider from "./ui/dependencyCodeLensProvider";
-import RemoveDependencyCommand from "./commands/remove";
 import ExitScriptEnvironment from "./commands/exitScriptEnvironment";
 import ShellSubcommandExecutor from "./impl/subcommandExecutor";
 import { getActiveTextEditorFilePath, getProjectRoot } from "./utils/vscode_";
 import ExtensionLogger from "./impl/logger";
 import InitScriptCommand from "./commands/initScript";
 import { getUvVscodeSettings } from "./settings";
-import InitCommand from "./commands/init";
-import SyncCommand from "./commands/sync";
+import UvCliImpl from "./impl/uvCli";
 
 export async function activate(context: vscode.ExtensionContext) {
   const validateRepoOutputChannel = vscode.window.createOutputChannel("UV", {
@@ -64,7 +63,7 @@ export async function activate(context: vscode.ExtensionContext) {
         uvBinaryPath,
         projectRoot.uri.fsPath,
         new VscodeApiInterpreterManager(pythonExtension),
-        new ShellSubcommandExecutor(logger, config),
+        new ShellSubcommandExecutor(logger),
       );
 
       const wasScript = await selectCommand.run();
@@ -85,6 +84,68 @@ export async function activate(context: vscode.ExtensionContext) {
   if (activeTextEditorChangeDisposable !== undefined) {
     context.subscriptions.push(activeTextEditorChangeDisposable);
   }
+
+  // UV Commands
+  context.subscriptions.push(
+    // add
+    vscode.commands.registerCommand("uv-vscode.add", async () => {
+      const command = new UvCliImpl(
+        "add",
+        new VscodeApiInputRequest(),
+        new ShellSubcommandExecutor(logger),
+        projectRoot.uri.fsPath,
+        uvBinaryPath,
+        logger,
+        config,
+        getActiveTextEditorFilePath(),
+      );
+      await command.run();
+    }),
+    // remove
+    vscode.commands.registerCommand("uv-vscode.remove", async () => {
+      const command = new UvCliImpl(
+        "remove",
+        new VscodeApiInputRequest(),
+        new ShellSubcommandExecutor(logger),
+        projectRoot.uri.fsPath,
+        uvBinaryPath,
+        logger,
+        config,
+        getActiveTextEditorFilePath(),
+      );
+      await command.run();
+    }),
+
+    // init
+    vscode.commands.registerCommand("uv-vscode.init", async () => {
+      const command = new UvCliImpl(
+        "init",
+        new VscodeApiInputRequest(),
+        new ShellSubcommandExecutor(logger),
+        projectRoot.uri.fsPath,
+        uvBinaryPath,
+        logger,
+        config,
+        getActiveTextEditorFilePath(),
+      );
+      await command.run();
+    }),
+
+    // sync
+    vscode.commands.registerCommand("uv-vscode.sync", async () => {
+      const command = new UvCliImpl(
+        "sync",
+        new VscodeApiInputRequest(),
+        new ShellSubcommandExecutor(logger),
+        projectRoot.uri.fsPath,
+        uvBinaryPath,
+        logger,
+        config,
+        getActiveTextEditorFilePath(),
+      );
+      await command.run();
+    }),
+  );
 
   context.subscriptions.push(
     // Handle configuration changes
@@ -115,31 +176,7 @@ export async function activate(context: vscode.ExtensionContext) {
         }
       },
     ),
-    // Register commands
-    // add
-    vscode.commands.registerCommand("uv-vscode.add", async () => {
-      const command = new AddDependencyCommand(
-        new VscodeApiInputRequest(),
-        new ShellSubcommandExecutor(logger, config),
-        projectRoot.uri.fsPath,
-        uvBinaryPath,
-        getActiveTextEditorFilePath(),
-      );
-      await command.run();
-    }),
-    // remove
-    vscode.commands.registerCommand("uv-vscode.remove", async () => {
-      const command = new RemoveDependencyCommand(
-        new VscodeApiInputRequest(),
-        new ShellSubcommandExecutor(logger, config),
-        projectRoot.uri.fsPath,
-        uvBinaryPath,
-        logger,
-        config,
-        getActiveTextEditorFilePath(),
-      );
-      await command.run();
-    }),
+
     // initScript
     vscode.commands.registerCommand("uv-vscode.initScript", async () => {
       const activeFilePath = getActiveTextEditorFilePath();
@@ -148,40 +185,24 @@ export async function activate(context: vscode.ExtensionContext) {
         vscode.window.showErrorMessage("No active text editor found.");
         return;
       }
-
       const command = new InitScriptCommand(
-        new ShellSubcommandExecutor(logger, config),
-        uvBinaryPath,
-        activeFilePath,
+        new UvCliImpl(
+          "init",
+          new PredefinedInputRequester("--script " + activeFilePath),
+          new ShellSubcommandExecutor(logger),
+          projectRoot.uri.fsPath,
+          uvBinaryPath,
+          logger,
+          config,
+          getActiveTextEditorFilePath(),
+        ),
         new SelectScriptInterpreterCommand(
           activeFilePath,
           uvBinaryPath,
           projectRoot.uri.fsPath,
           new VscodeApiInterpreterManager(pythonExtension),
-          new ShellSubcommandExecutor(logger, config),
+          new ShellSubcommandExecutor(logger),
         ),
-      );
-      await command.run();
-    }),
-
-    // init
-    vscode.commands.registerCommand("uv-vscode.init", async () => {
-      const command = new InitCommand(
-        new VscodeApiInputRequest(),
-        new ShellSubcommandExecutor(logger, config),
-        uvBinaryPath,
-        projectRoot.uri.fsPath,
-      );
-      await command.run();
-    }),
-
-    // sync
-    vscode.commands.registerCommand("uv-vscode.sync", async () => {
-      const command = new SyncCommand(
-        new VscodeApiInputRequest(),
-        new ShellSubcommandExecutor(logger, config),
-        uvBinaryPath,
-        projectRoot.uri.fsPath,
       );
       await command.run();
     }),

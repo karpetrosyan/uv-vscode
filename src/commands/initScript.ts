@@ -1,23 +1,23 @@
-import type SubcommandExecutor from "../dependencies/subcommandExecutor";
+import type { UvCommand } from "../dependencies/uvCli";
+import type UvCli from "../dependencies/uvCli";
 import Command from "./base";
 import type SelectScriptInterpreterCommand from "./selectInlineScriptInterpreter";
 
 /**
  * Initializes a script using uv init --script
  */
-export default class InitScriptCommand extends Command {
+export default class InitScriptCommand<
+  T extends UvCommand = "init",
+> extends Command {
   constructor(
-    public subcommandExecutor: SubcommandExecutor,
-    public uvBinaryPath: string,
-    public activeFilePath: string,
-    public selectScriptInterpreter: SelectScriptInterpreterCommand
+    public uvCli: UvCli<T>,
+    public selectScriptInterpreter: SelectScriptInterpreterCommand,
   ) {
     super();
   }
 
   public async run(): Promise<void> {
-    const args = ["init", "--python=3.12", "--script", this.activeFilePath];
-    await this.subcommandExecutor.execute(this.uvBinaryPath, args);
+    await this.uvCli.run();
     // After initializing the script, we should also select the interpreter
     await this.selectScriptInterpreter.run();
   }

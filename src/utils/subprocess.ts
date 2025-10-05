@@ -10,7 +10,7 @@ export function execFileShellModeRequired(file: string) {
 
 export function executeFile(
   file: string,
-  args: string[] = []
+  args: string[] = [],
 ): Promise<string> {
   const shell = execFileShellModeRequired(file);
   return new Promise((resolve, reject) => {
@@ -24,7 +24,7 @@ export function executeFile(
         } else {
           resolve(stdout);
         }
-      }
+      },
     );
   });
 }
@@ -36,7 +36,7 @@ export function executeFile(
  */
 export function getOptionValue(
   input: string,
-  option: string
+  option: string,
 ): string | undefined {
   const patterns = [
     // --script="value with spaces"
