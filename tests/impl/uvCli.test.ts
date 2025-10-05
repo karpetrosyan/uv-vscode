@@ -233,7 +233,7 @@ describe("UvCliImpl", () => {
 
       expect(executor.inputs).toMatchInlineSnapshot(`
         [
-          "/path/to/uv sync --directory /project/root ",
+          "/path/to/uv sync --directory /project/root",
         ]
       `);
     });
@@ -306,7 +306,7 @@ describe("UvCliImpl", () => {
 
       expect(executor.inputs).toMatchInlineSnapshot(`
         [
-          "/path/to/uv init --directory /project/root --python=3.12 ",
+          "/path/to/uv init --directory /project/root --python=3.12",
         ]
       `);
     });
@@ -486,7 +486,7 @@ describe("UvCliImpl", () => {
 
       expect(executor.inputs).toMatchInlineSnapshot(`
         [
-          "/path/to/uv sync --script /project/root/script.py --directory /project/root ",
+          "/path/to/uv sync --script /project/root/script.py --directory /project/root",
         ]
       `);
     });
@@ -573,7 +573,7 @@ describe("UvCliImpl", () => {
 
       expect(executor.inputs).toMatchInlineSnapshot(`
         [
-          "/path/to/uv init --directory /project/root --python=3.12 ",
+          "/path/to/uv init --directory /project/root --python=3.12",
         ]
       `);
     });
@@ -654,7 +654,7 @@ describe("UvCliImpl", () => {
 
       expect(executor.inputs).toMatchInlineSnapshot(`
         [
-          "/path/to/uv sync --script /project/root/script.py --directory /project/root ",
+          "/path/to/uv sync --script /project/root/script.py --directory /project/root",
         ]
       `);
     });
@@ -704,7 +704,7 @@ describe("UvCliImpl", () => {
 
       expect(executor.inputs).toMatchInlineSnapshot(`
         [
-          "/path/to/uv sync --directory /project/root ",
+          "/path/to/uv sync --directory /project/root",
         ]
       `);
     });
