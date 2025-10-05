@@ -62,11 +62,11 @@ export default class DependencyCodeLensProvider implements CodeLensProvider {
             ...[
               new CodeLens(range, {
                 title: "$(add) Add a dependency",
-                command: "uv-vscode.addDependency",
+                command: "uv-vscode.add",
               }),
               new CodeLens(range, {
                 title: "$(edit) Remove dependency",
-                command: "uv-vscode.removeDependency",
+                command: "uv-vscode.remove",
               }),
             ],
           );

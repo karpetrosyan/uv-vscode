@@ -8,7 +8,7 @@ test("Test ExitScriptEnvironmentCommand basic", async () => {
   await interpreterManager.select("some/path");
 
   const logger = new FakeLogger();
-  const command = new ExitScriptEnvironment(interpreterManager, logger);
+  const command = new ExitScriptEnvironment(interpreterManager);
 
   await command.run();
 
@@ -18,9 +18,5 @@ test("Test ExitScriptEnvironmentCommand basic", async () => {
   expect(interpreterManager.currentInterpreterPath).toMatchInlineSnapshot(
     `"some/path"`,
   );
-  expect(logger.collectedLogs).toMatchInlineSnapshot(`
-    [
-      "Exiting script environment. Previous interpreter: none",
-    ]
-  `);
+  expect(logger.collectedLogs).toMatchInlineSnapshot(`[]`);
 });

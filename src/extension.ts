@@ -5,16 +5,18 @@ import { findUvBinaryPath } from "./uv_binary";
 import { PythonExtension } from "@vscode/python-extension";
 import SelectScriptInterpreterCommand from "./commands/selectInlineScriptInterpreter";
 import VscodeApiInterpreterManager from "./impl/selectInterpreterCallback";
-import AddDependencyCommand from "./commands/addDependency";
+import AddDependencyCommand from "./commands/add";
 import VscodeApiInputRequest from "./impl/inputRequester";
 import DependencyCodeLensProvider from "./ui/dependencyCodeLensProvider";
-import RemoveDependencyCommand from "./commands/removeDependency";
+import RemoveDependencyCommand from "./commands/remove";
 import ExitScriptEnvironment from "./commands/exitScriptEnvironment";
 import ShellSubcommandExecutor from "./impl/subcommandExecutor";
 import { getActiveTextEditorFilePath, getProjectRoot } from "./utils/vscode_";
 import ExtensionLogger from "./impl/logger";
 import InitScriptCommand from "./commands/initScript";
 import { getUvVscodeSettings } from "./settings";
+import InitCommand from "./commands/init";
+import SyncCommand from "./commands/sync";
 
 export async function activate(context: vscode.ExtensionContext) {
   const validateRepoOutputChannel = vscode.window.createOutputChannel("UV", {
@@ -63,15 +65,12 @@ export async function activate(context: vscode.ExtensionContext) {
         projectRoot.uri.fsPath,
         new VscodeApiInterpreterManager(pythonExtension),
         new ShellSubcommandExecutor(logger, config),
-        logger,
-        config,
       );
 
       const wasScript = await selectCommand.run();
       if (!wasScript) {
         const exitCommand = new ExitScriptEnvironment(
           new VscodeApiInterpreterManager(pythonExtension),
-          logger,
         );
 
         await exitCommand.run();
@@ -117,21 +116,19 @@ export async function activate(context: vscode.ExtensionContext) {
       },
     ),
     // Register commands
-    // addDependency
-    vscode.commands.registerCommand("uv-vscode.addDependency", async () => {
+    // add
+    vscode.commands.registerCommand("uv-vscode.add", async () => {
       const command = new AddDependencyCommand(
         new VscodeApiInputRequest(),
         new ShellSubcommandExecutor(logger, config),
         projectRoot.uri.fsPath,
         uvBinaryPath,
-        logger,
-        config,
         getActiveTextEditorFilePath(),
       );
       await command.run();
     }),
-    // removeDependency
-    vscode.commands.registerCommand("uv-vscode.removeDependency", async () => {
+    // remove
+    vscode.commands.registerCommand("uv-vscode.remove", async () => {
       const command = new RemoveDependencyCommand(
         new VscodeApiInputRequest(),
         new ShellSubcommandExecutor(logger, config),
@@ -156,17 +153,35 @@ export async function activate(context: vscode.ExtensionContext) {
         new ShellSubcommandExecutor(logger, config),
         uvBinaryPath,
         activeFilePath,
-        logger,
-        config,
         new SelectScriptInterpreterCommand(
           activeFilePath,
           uvBinaryPath,
           projectRoot.uri.fsPath,
           new VscodeApiInterpreterManager(pythonExtension),
           new ShellSubcommandExecutor(logger, config),
-          logger,
-          config,
         ),
+      );
+      await command.run();
+    }),
+
+    // init
+    vscode.commands.registerCommand("uv-vscode.init", async () => {
+      const command = new InitCommand(
+        new VscodeApiInputRequest(),
+        new ShellSubcommandExecutor(logger, config),
+        uvBinaryPath,
+        projectRoot.uri.fsPath,
+      );
+      await command.run();
+    }),
+
+    // sync
+    vscode.commands.registerCommand("uv-vscode.sync", async () => {
+      const command = new SyncCommand(
+        new VscodeApiInputRequest(),
+        new ShellSubcommandExecutor(logger, config),
+        uvBinaryPath,
+        projectRoot.uri.fsPath,
       );
       await command.run();
     }),

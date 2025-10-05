@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import AddDependencyCommand from "../../src/commands/addDependency";
+import AddDependencyCommand from "../../src/commands/add";
 import {
   FakeInputRequester,
   FakeLogger,
@@ -14,21 +14,15 @@ function withTempDir(fn: (dir: string) => Promise<void>) {
   return fn(dir).finally(() => rmSync(dir, { recursive: true, force: true }));
 }
 
-test("Basic AddDependency", async () => {
+test("Basic Add", async () => {
   const inputRequester = new FakeInputRequester(["dependency-name"]);
   const subcommandExecutor = new FakeSubcommandExecutor();
   const logger = new FakeLogger();
-  const config = {
-    noConfigForScripts: true,
-    autoSelectInterpreterForScripts: true,
-  };
   const command = new AddDependencyCommand(
     inputRequester,
     subcommandExecutor,
     "/path",
-    "/uv",
-    logger,
-    config,
+    "/uv"
   );
 
   await command.run();
@@ -39,39 +33,27 @@ test("Basic AddDependency", async () => {
       "/uv sync --directory /path --inexact --all-extras",
     ]
   `);
-  expect(logger.collectedLogs).toMatchInlineSnapshot(`
-    [
-      "Checking if the active file undefined is a script",
-      "Adding dependency with command: /uv add --directory /path dependency-name",
-      "Syncing dependencies with command: /uv sync --directory /path --inexact --all-extras",
-    ]
-  `);
+  expect(logger.collectedLogs).toMatchInlineSnapshot(`[]`);
 });
 
-test("AddDependency without input", async () => {
+test("Add without input", async () => {
   const inputRequester = new FakeInputRequester([]);
   const subcommandExecutor = new FakeSubcommandExecutor();
   const logger = new FakeLogger();
-  const config = {
-    noConfigForScripts: true,
-    autoSelectInterpreterForScripts: true,
-  };
   const command = new AddDependencyCommand(
     inputRequester,
     subcommandExecutor,
     "/path",
-    "/uv",
-    logger,
-    config,
+    "/uv"
   );
 
   await expect(command.run()).rejects.toThrowError(
-    "No input provided for the dependency.",
+    "No input provided for the dependency."
   );
   expect(logger.collectedLogs).toMatchInlineSnapshot(`[]`);
 });
 
-test("AddDependency with active script file", async () => {
+test("Add with active script file", async () => {
   const inputRequester = new FakeInputRequester(["hishel"]);
   const subcommandExecutor = new FakeSubcommandExecutor();
 
@@ -82,24 +64,27 @@ test("AddDependency with active script file", async () => {
 # ///
 `;
     writeFileSync(join(dir, "script.py"), pythonInline);
-    const logger = new FakeLogger();
-    const config = {
-      noConfigForScripts: true,
-      autoSelectInterpreterForScripts: true,
-    };
     const command = new AddDependencyCommand(
       inputRequester,
       subcommandExecutor,
       "/path",
       "/uv",
-      logger,
-      config,
-      join(dir, "script.py"),
+      join(dir, "script.py")
     );
 
     await command.run();
 
-    expect(subcommandExecutor.inputs[0]).includes(`--script`);
-    expect(subcommandExecutor.inputs[1]).includes(`--script`);
+    expect(
+      subcommandExecutor.inputs[0]?.replace(
+        RegExp(`\\s*--script\\s+(?!-)\\S+`, "g"),
+        ""
+      )
+    ).toMatchInlineSnapshot(`"/uv add --directory /path hishel"`);
+    expect(
+      subcommandExecutor.inputs[1]?.replace(
+        RegExp(`\\s*--script\\s+(?!-)\\S+`, "g"),
+        ""
+      )
+    ).toMatchInlineSnapshot(`"/uv sync --directory /path --inexact"`);
   });
 });

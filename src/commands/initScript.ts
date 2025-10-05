@@ -1,6 +1,4 @@
-import type Logger from "../dependencies/logger";
 import type SubcommandExecutor from "../dependencies/subcommandExecutor";
-import type { UvVscodeSettings } from "../settings";
 import Command from "./base";
 import type SelectScriptInterpreterCommand from "./selectInlineScriptInterpreter";
 
@@ -12,31 +10,14 @@ export default class InitScriptCommand extends Command {
     public subcommandExecutor: SubcommandExecutor,
     public uvBinaryPath: string,
     public activeFilePath: string,
-    public logger: Logger,
-    public config: UvVscodeSettings,
-    public selectScriptInterpreter: SelectScriptInterpreterCommand,
+    public selectScriptInterpreter: SelectScriptInterpreterCommand
   ) {
     super();
   }
 
   public async run(): Promise<void> {
-    const noConfigOptions = this.config.noConfigForScripts
-      ? ["--no-config"]
-      : [];
-    const args = [
-      "init",
-      ...noConfigOptions,
-      "--python=3.12",
-      "--script",
-      this.activeFilePath,
-    ];
-
-    this.logger.debug(
-      `Initializing script with command: ${this.uvBinaryPath} ${args.join(" ")}`,
-    );
-
+    const args = ["init", "--python=3.12", "--script", this.activeFilePath];
     await this.subcommandExecutor.execute(this.uvBinaryPath, args);
-
     // After initializing the script, we should also select the interpreter
     await this.selectScriptInterpreter.run();
   }

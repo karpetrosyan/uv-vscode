@@ -41,12 +41,12 @@
     },
     "commands": [
       {
-        "command": "uv-vscode.removeDependency",
+        "command": "uv-vscode.remove",
         "category": "Uv",
         "title": "Remove Dependency"
       },
       {
-        "command": "uv-vscode.addDependency",
+        "command": "uv-vscode.add",
         "category": "Uv",
         "title": "Add Dependency"
       },
@@ -54,6 +54,16 @@
         "command": "uv-vscode.initScript",
         "category": "Uv",
         "title": "Initialize Script"
+      },
+      {
+        "command": "uv-vscode.init",
+        "category": "Uv",
+        "title": "Initialize a new project"
+      },
+      {
+        "command": "uv-vscode.sync",
+        "category": "Uv",
+        "title": "Sync dependencies"
       },
       {
         "command": "uv-vscode.showLogs",

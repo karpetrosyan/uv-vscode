@@ -2,7 +2,6 @@ import vscode from "vscode";
 
 export type UvVscodeSettings = {
   autoSelectInterpreterForScripts: boolean;
-  noConfigForScripts: boolean;
 };
 
 export function getUvVscodeSettings(): UvVscodeSettings {
@@ -11,6 +10,5 @@ export function getUvVscodeSettings(): UvVscodeSettings {
     autoSelectInterpreterForScripts: config.get<boolean>(
       "autoSelectInterpreterForScripts"!,
     )!,
-    noConfigForScripts: config.get<boolean>("noConfigForScripts")!,
   };
 }

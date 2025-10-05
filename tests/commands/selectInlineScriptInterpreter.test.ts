@@ -19,18 +19,12 @@ test("SelectScriptInterpreter with non-script file", async () => {
   withTempDir(async (dir) => {
     writeFileSync(join(dir, "script.py"), "print(10");
     const logger = new FakeLogger();
-    const config = {
-      noConfigForScripts: true,
-      autoSelectInterpreterForScripts: true,
-    };
     const command = new SelectScriptInterpreterCommand(
       join(dir, "script.py"),
       "/uv",
       "/project",
       interpreterManager,
       subcommandExecutor,
-      logger,
-      config,
     );
 
     await expect(command.run()).resolves.toStrictEqual(false);
@@ -49,19 +43,12 @@ test("SelectScriptInterpreter with script file", async () => {
 # ///
 `;
     writeFileSync(join(dir, "script.py"), pythonInline);
-    const logger = new FakeLogger();
-    const config = {
-      noConfigForScripts: true,
-      autoSelectInterpreterForScripts: true,
-    };
     const command = new SelectScriptInterpreterCommand(
       join(dir, "script.py"),
       "/uv",
       "/project",
       interpreterManager,
       subcommandExecutor,
-      logger,
-      config,
     );
     await command.run();
   });
@@ -91,19 +78,12 @@ test("SelectScriptInterpreter multiple times", async () => {
 # ///
 `;
     writeFileSync(join(dir, "script.py"), pythonInline);
-    const logger = new FakeLogger();
-    const config = {
-      noConfigForScripts: true,
-      autoSelectInterpreterForScripts: true,
-    };
     const command = new SelectScriptInterpreterCommand(
       join(dir, "script.py"),
       "/uv",
       "/project",
       interpreterManager,
       subcommandExecutor,
-      logger,
-      config,
     );
 
     await command.run();

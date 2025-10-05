@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import RemoveDependencyCommand from "../../src/commands/removeDependency";
+import RemoveDependencyCommand from "../../src/commands/remove";
 import {
   FakeInputRequester,
   FakeLogger,
@@ -9,7 +9,7 @@ import {
 import { join } from "node:path";
 import { writeFileSync } from "node:fs";
 
-test("Basic RemoveDependency", async () => {
+test("Basic Remove", async () => {
   const inputRequester = new FakeInputRequester(["dependency-name"]);
   const subcommandExecutor = new FakeSubcommandExecutor();
   const logger = new FakeLogger();
@@ -34,16 +34,10 @@ test("Basic RemoveDependency", async () => {
       "/uv sync --directory /path --inexact",
     ]
   `);
-  expect(logger.collectedLogs).toMatchInlineSnapshot(`
-    [
-      "Checking if the active file undefined is a script",
-      "Removing dependency with command: /uv remove --directory /path dependency-name",
-      "Syncing dependencies with command: /uv sync --directory /path --inexact",
-    ]
-  `);
+  expect(logger.collectedLogs).toMatchInlineSnapshot(`[]`);
 });
 
-test("RemoveDependency without input", async () => {
+test("Remove without input", async () => {
   const inputRequester = new FakeInputRequester([]);
   const subcommandExecutor = new FakeSubcommandExecutor();
   const logger = new FakeLogger();
@@ -66,7 +60,7 @@ test("RemoveDependency without input", async () => {
   expect(logger.collectedLogs).toMatchInlineSnapshot(`[]`);
 });
 
-test("RemoveDependency with active script file", async () => {
+test("Remove with active script file", async () => {
   const inputRequester = new FakeInputRequester(["hishel"]);
   const subcommandExecutor = new FakeSubcommandExecutor();
 

@@ -1,7 +1,6 @@
 import { expect, test } from "vitest";
 import {
   FakeInterpreterManager,
-  FakeLogger,
   FakeSubcommandExecutor,
   withTempDir,
 } from "../fixtures";
@@ -11,12 +10,7 @@ import { writeFileSync } from "fs";
 import { join } from "path";
 
 test("Basic InitScript", async () => {
-  const logger = new FakeLogger();
   const subcommandExecutor = new FakeSubcommandExecutor();
-  const config = {
-    noConfigForScripts: true,
-    autoSelectInterpreterForScripts: true,
-  };
   const interpreterManager = new FakeInterpreterManager();
   await withTempDir(async (dir) => {
     const pythonInline = `# /// script
@@ -28,16 +22,12 @@ test("Basic InitScript", async () => {
       subcommandExecutor,
       "/uv",
       join(dir, "script.py"),
-      logger,
-      config,
       new SelectScriptInterpreterCommand(
         join(dir, "script.py"),
         "/uv",
         "/path/to/project",
         interpreterManager,
         subcommandExecutor,
-        logger,
-        config,
       ),
     );
     await command.run();
@@ -52,7 +42,6 @@ test("Basic InitScript", async () => {
     [
       "/uv",
       "init",
-      "--no-config",
       "--python=3.12",
     ]
   `,

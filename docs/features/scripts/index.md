@@ -1,6 +1,6 @@
-When talking about scripts, we often refer to a **lightweight** program that solves a **simple task** and is **portable**.
+A script is typically a **lightweight program** that solves a **simple task** and is **portable**.
 
-When writing a `Python` script, we often need a place to include meta-information, such as which packages it depends on and which `Python` version it should run with.
+When writing a Python script, you often need a place to include meta-information, such as package dependencies and the required Python version.
 
 [PEP 723](https://peps.python.org/pep-0723/) addresses this problem by introducing a way to write inline metadata directly into the script. Simply put, it’s just a comment with special syntax where you can define TOML-like configuration, similar to how you would in a `pyproject.toml` file.
 
