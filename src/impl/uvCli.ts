@@ -88,18 +88,21 @@ export default class UvCliImpl<T extends UvCommand> implements UvCli<T> {
       throw new Error("No input provided for the dependency.");
     }
 
+    const splitedInput = input?.split(" ").map((dep) => dep.trim()) ?? [];
+
     const args = [
       this.command,
       ...(supportsScriptOption(this.command) ? scriptOption : []),
       ...directoryOption,
       ...getCommandDefaults(this.command, input ?? ""),
-      ...(input === undefined ? [] : input.split(" ").map((dep) => dep.trim())),
+      ...(input === "" ? [] : splitedInput),
     ];
 
     switch (this.command) {
       case "add":
       case "remove":
       case "sync":
+      case "lock":
       case "init": {
         await this.subcommandExecutor.execute(this.uvBinaryPath, args);
         break;

@@ -1,4 +1,4 @@
-export type UvCommand = "add" | "remove" | "sync" | "init";
+export type UvCommand = "add" | "remove" | "sync" | "init" | "lock";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default interface UvCli<T extends UvCommand> {

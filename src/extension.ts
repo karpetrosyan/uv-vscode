@@ -145,6 +145,21 @@ export async function activate(context: vscode.ExtensionContext) {
       );
       await command.run();
     }),
+
+    // lock
+    vscode.commands.registerCommand("uv-vscode.lock", async () => {
+      const command = new UvCliImpl(
+        "lock",
+        new VscodeApiInputRequest(),
+        new ShellSubcommandExecutor(logger),
+        projectRoot.uri.fsPath,
+        uvBinaryPath,
+        logger,
+        config,
+        getActiveTextEditorFilePath(),
+      );
+      await command.run();
+    }),
   );
 
   context.subscriptions.push(

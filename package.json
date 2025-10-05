@@ -66,6 +66,11 @@
         "title": "Sync dependencies"
       },
       {
+        "command": "uv-vscode.lock",
+        "category": "Uv",
+        "title": "Lock dependencies"
+      },
+      {
         "command": "uv-vscode.showLogs",
         "category": "Uv",
         "title": "Show Logs"
