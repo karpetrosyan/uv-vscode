@@ -27,7 +27,7 @@
     "configuration": {
       "title": "Uv",
       "properties": {
-        "uv.sentUvCommandToTerminal": {
+        "uv.sendUvCommandToTerminal": {
           "type": "boolean",
           "default": false,
           "description": "When enabled, the UV command will be sent to the terminal instead of being executed directly."

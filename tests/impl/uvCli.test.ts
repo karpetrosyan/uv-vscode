@@ -4,6 +4,7 @@ import {
   FakeInputRequester,
   FakeSubcommandExecutor,
   FakeLogger,
+  FakeTerminalSender,
 } from "../fixtures";
 import type { UvVscodeSettings } from "../../src/settings";
 import { isScriptPath } from "../../src/utils/inlineMetadata";
@@ -12,7 +13,6 @@ import { isScriptPath } from "../../src/utils/inlineMetadata";
 vi.mock("../../src/utils/inlineMetadata", () => ({
   isScriptPath: vi.fn(),
 }));
-
 describe("UvCliImpl", () => {
   let mockConfig: UvVscodeSettings;
 
@@ -35,6 +35,7 @@ describe("UvCliImpl", () => {
         "/path/to/uv",
         logger,
         mockConfig,
+        new FakeTerminalSender(),
       );
 
       await cli.run();
@@ -59,6 +60,7 @@ describe("UvCliImpl", () => {
         "/path/to/uv",
         logger,
         mockConfig,
+        new FakeTerminalSender(),
       );
 
       await expect(cli.run()).rejects.toThrowErrorMatchingInlineSnapshot(
@@ -79,6 +81,7 @@ describe("UvCliImpl", () => {
         "/path/to/uv",
         logger,
         mockConfig,
+        new FakeTerminalSender(),
       );
 
       await cli.run();
@@ -105,6 +108,7 @@ describe("UvCliImpl", () => {
         "/path/to/uv",
         logger,
         mockConfig,
+        new FakeTerminalSender(),
       );
 
       await cli.run();
@@ -131,6 +135,7 @@ describe("UvCliImpl", () => {
         "/path/to/uv",
         logger,
         mockConfig,
+        new FakeTerminalSender(),
       );
 
       await cli.run();
@@ -157,6 +162,7 @@ describe("UvCliImpl", () => {
         "/path/to/uv",
         logger,
         mockConfig,
+        new FakeTerminalSender(),
       );
 
       await cli.run();
@@ -181,6 +187,7 @@ describe("UvCliImpl", () => {
         "/path/to/uv",
         logger,
         mockConfig,
+        new FakeTerminalSender(),
       );
 
       await expect(cli.run()).rejects.toThrowErrorMatchingInlineSnapshot(
@@ -201,6 +208,7 @@ describe("UvCliImpl", () => {
         "/path/to/uv",
         logger,
         mockConfig,
+        new FakeTerminalSender(),
       );
 
       await cli.run();
@@ -227,6 +235,7 @@ describe("UvCliImpl", () => {
         "/path/to/uv",
         logger,
         mockConfig,
+        new FakeTerminalSender(),
       );
 
       await cli.run();
@@ -251,6 +260,7 @@ describe("UvCliImpl", () => {
         "/path/to/uv",
         logger,
         mockConfig,
+        new FakeTerminalSender(),
       );
 
       await cli.run();
@@ -275,6 +285,7 @@ describe("UvCliImpl", () => {
         "/path/to/uv",
         logger,
         mockConfig,
+        new FakeTerminalSender(),
       );
 
       await expect(cli.run()).resolves.not.toThrow();
@@ -300,6 +311,7 @@ describe("UvCliImpl", () => {
         "/path/to/uv",
         logger,
         mockConfig,
+        new FakeTerminalSender(),
       );
 
       await cli.run();
@@ -324,6 +336,7 @@ describe("UvCliImpl", () => {
         "/path/to/uv",
         logger,
         mockConfig,
+        new FakeTerminalSender(),
       );
 
       await cli.run();
@@ -348,6 +361,7 @@ describe("UvCliImpl", () => {
         "/path/to/uv",
         logger,
         mockConfig,
+        new FakeTerminalSender(),
       );
 
       await cli.run();
@@ -372,6 +386,7 @@ describe("UvCliImpl", () => {
         "/path/to/uv",
         logger,
         mockConfig,
+        new FakeTerminalSender(),
       );
 
       await expect(cli.run()).resolves.not.toThrow();
@@ -395,6 +410,7 @@ describe("UvCliImpl", () => {
         "/path/to/uv",
         logger,
         mockConfig,
+        new FakeTerminalSender(),
       );
 
       await cli.run();
@@ -423,6 +439,7 @@ describe("UvCliImpl", () => {
         "/path/to/uv",
         logger,
         mockConfig,
+        new FakeTerminalSender(),
         "/project/root/script.py",
       );
 
@@ -451,6 +468,7 @@ describe("UvCliImpl", () => {
         "/path/to/uv",
         logger,
         mockConfig,
+        new FakeTerminalSender(),
         "/project/root/script.py",
       );
 
@@ -479,6 +497,7 @@ describe("UvCliImpl", () => {
         "/path/to/uv",
         logger,
         mockConfig,
+        new FakeTerminalSender(),
         "/project/root/script.py",
       );
 
@@ -508,6 +527,7 @@ describe("UvCliImpl", () => {
         "/path/to/uv",
         logger,
         mockConfig,
+        new FakeTerminalSender(),
         "/project/root/script.py",
       );
 
@@ -538,6 +558,7 @@ describe("UvCliImpl", () => {
         "/path/to/uv",
         logger,
         mockConfig,
+        new FakeTerminalSender(),
         "/project/root/script.py",
       );
 
@@ -566,6 +587,7 @@ describe("UvCliImpl", () => {
         "/path/to/uv",
         logger,
         mockConfig,
+        new FakeTerminalSender(),
         "/project/root/script.py",
       );
 
@@ -593,6 +615,7 @@ describe("UvCliImpl", () => {
         "/path/to/uv",
         logger,
         mockConfig,
+        new FakeTerminalSender(),
         "/project/root/not-a-script.txt",
       );
 
@@ -620,6 +643,7 @@ describe("UvCliImpl", () => {
         "/path/to/uv",
         logger,
         mockConfig,
+        new FakeTerminalSender(),
         "/project/root/file.py",
       );
 
@@ -647,6 +671,7 @@ describe("UvCliImpl", () => {
         "/path/to/uv",
         logger,
         mockConfig,
+        new FakeTerminalSender(),
         "/project/root/script.py",
       );
 
@@ -674,6 +699,7 @@ describe("UvCliImpl", () => {
         "/path/to/uv",
         logger,
         mockConfig,
+        new FakeTerminalSender(),
       );
 
       await cli.run();
@@ -698,6 +724,7 @@ describe("UvCliImpl", () => {
         "/path/to/uv",
         logger,
         mockConfig,
+        new FakeTerminalSender(),
       );
 
       await cli.run();
@@ -724,6 +751,7 @@ describe("UvCliImpl", () => {
         "/path/to/uv",
         logger,
         mockConfig,
+        new FakeTerminalSender(),
       );
 
       await cli.run();
@@ -750,6 +778,7 @@ describe("UvCliImpl", () => {
         "/path/to/uv",
         logger,
         mockConfig,
+        new FakeTerminalSender(),
         undefined,
       );
 
@@ -781,6 +810,7 @@ describe("UvCliImpl", () => {
         "/path/to/uv",
         logger,
         mockConfig,
+        new FakeTerminalSender(),
       );
 
       await expect(cli.run()).rejects.toThrowErrorMatchingInlineSnapshot(

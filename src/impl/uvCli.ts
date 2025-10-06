@@ -1,6 +1,7 @@
 import type InputRequester from "../dependencies/inputRequester";
 import type Logger from "../dependencies/logger";
 import type SubcommandExecutor from "../dependencies/subcommandExecutor";
+import type TerminalSender from "../dependencies/terminalSender";
 import type { UvCommand } from "../dependencies/uvCli";
 import type UvCli from "../dependencies/uvCli";
 import type { UvVscodeSettings } from "../settings";
@@ -59,6 +60,7 @@ export default class UvCliImpl<T extends UvCommand> implements UvCli<T> {
     public uvBinaryPath: string,
     public logger: Logger,
     public config: UvVscodeSettings,
+    public terminalSender: TerminalSender,
     public activeFilePath?: string,
   ) {}
 
@@ -98,6 +100,8 @@ export default class UvCliImpl<T extends UvCommand> implements UvCli<T> {
       ...(input === "" ? [] : splitedInput),
     ];
 
+    const commandsToExecute: [string, string[]][] = [];
+
     switch (this.command) {
       case "add":
       case "remove":
@@ -105,7 +109,7 @@ export default class UvCliImpl<T extends UvCommand> implements UvCli<T> {
       case "lock":
       case "venv":
       case "init": {
-        await this.subcommandExecutor.execute(this.uvBinaryPath, args);
+        commandsToExecute.push([this.uvBinaryPath, args]);
         break;
       }
     }
@@ -118,7 +122,18 @@ export default class UvCliImpl<T extends UvCommand> implements UvCli<T> {
         ...directoryOption,
         ...(isScript ? [] : ["--all-extras"]),
       ];
-      await this.subcommandExecutor.execute(this.uvBinaryPath, syncArgs);
+      commandsToExecute.push([this.uvBinaryPath, syncArgs]);
+    }
+
+    if (this.config.sendUvCommandToTerminal) {
+      const commandsString = commandsToExecute
+        .map(([cmd, cmdArgs]) => [cmd, ...cmdArgs].join(" "))
+        .join("\n");
+      this.terminalSender.sendText(commandsString, true);
+    } else {
+      for (const [cmd, cmdArgs] of commandsToExecute) {
+        await this.subcommandExecutor.execute(cmd, cmdArgs);
+      }
     }
   }
 }

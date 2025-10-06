@@ -6,6 +6,7 @@ import type InterpreterManager from "../src/dependencies/interpreterManager";
 import type SubcommandExecutor from "../src/dependencies/subcommandExecutor";
 import type Logger from "../src/dependencies/logger";
 import { SCRIPTS_ENV_DIR } from "../src/constants";
+import type TerminalSender from "../src/dependencies/terminalSender";
 
 export class FakeInputRequester implements InputRequester {
   constructor(public responses: (string | undefined)[]) {}
@@ -60,6 +61,14 @@ export class FakeLogger implements Logger {
 
   isEnabledFor(level: "debug" | "error" | "info"): boolean {
     return level ? true : true;
+  }
+}
+
+export class FakeTerminalSender implements TerminalSender {
+  public inputs: [string, boolean][] = [];
+
+  sendText(text: string, execute?: boolean): void {
+    this.inputs.push([text, execute ?? false]);
   }
 }
 

@@ -2,7 +2,7 @@ import vscode from "vscode";
 
 export type UvVscodeSettings = {
   autoSelectInterpreterForScripts: boolean;
-  sentUvCommandToTerminal: boolean;
+  sendUvCommandToTerminal: boolean;
 };
 
 export function getUvVscodeSettings(): UvVscodeSettings {
@@ -11,6 +11,6 @@ export function getUvVscodeSettings(): UvVscodeSettings {
     autoSelectInterpreterForScripts: config.get<boolean>(
       "autoSelectInterpreterForScripts"!,
     )!,
-    sentUvCommandToTerminal: config.get<boolean>("sentUvCommandToTerminal")!,
+    sendUvCommandToTerminal: config.get<boolean>("sendUvCommandToTerminal")!,
   };
 }
