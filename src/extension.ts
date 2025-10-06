@@ -67,13 +67,21 @@ export async function activate(context: vscode.ExtensionContext) {
         new ShellSubcommandExecutor(logger),
       );
 
-      const wasScript = await selectCommand.run();
-      if (!wasScript) {
-        const exitCommand = new ExitScriptEnvironment(
-          new VscodeApiInterpreterManager(pythonExtension),
-        );
+      try {
+        const wasScript = await selectCommand.run();
+        if (!wasScript) {
+          const exitCommand = new ExitScriptEnvironment(
+            new VscodeApiInterpreterManager(pythonExtension),
+          );
 
-        await exitCommand.run();
+          await exitCommand.run();
+        }
+      } catch (error) {
+        vscode.window.showErrorMessage(
+          `Error selecting interpreter for script: ${
+            error instanceof Error ? error.message : String(error)
+          }`,
+        );
       }
     });
   };

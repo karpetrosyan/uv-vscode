@@ -37,6 +37,8 @@ export default class SelectScriptInterpreterCommand extends Command<boolean> {
       "find",
       "--script",
       String(this.activeFilePath),
+      "--directory",
+      this.projectRoot,
     ];
     const inlineScriptInterpreterPath = (
       await this.subcommandExecutor.execute(this.uvBinaryPath, findArgs)
