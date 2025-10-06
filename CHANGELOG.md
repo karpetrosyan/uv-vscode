@@ -1,3 +1,24 @@
+## [0.28.0] - 2025-10-06
+
+### 🚀 Features
+
+- Add vscode command for `uv lock`
+- Add vscode command for `uv venv`
+- Add vscode command for `uv sync`
+- Add `uv.sentUvCommandToTerminal` setting
+
+### 🐛 Bug Fixes
+
+- `sendUvCommandToTerminal` config typo
+
+### 🚜 Refactor
+
+- Improve commands
+- Add general uv command impl
+
+### 📚 Documentation
+
+- Improve docs
 ## [0.26.0] - 2025-10-02
 
 ### 🚀 Features
@@ -10,6 +31,10 @@
 ### 🐛 Bug Fixes
 
 - Display name
+
+### 📚 Documentation
+
+- Better readme
 ## [0.24.0] - 2025-09-28
 
 ### 🐛 Bug Fixes
