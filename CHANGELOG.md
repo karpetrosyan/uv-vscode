@@ -1,10 +1,14 @@
+## [0.30.0] - 2025-10-06
+
+### 🐛 Bug Fixes
+
+- Set `--directory` path when trying to find a script environment
 ## [0.28.0] - 2025-10-06
 
 ### 🚀 Features
 
 - Add vscode command for `uv lock`
 - Add vscode command for `uv venv`
-- Add vscode command for `uv sync`
 - Add `uv.sentUvCommandToTerminal` setting
 
 ### 🐛 Bug Fixes
