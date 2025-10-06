@@ -7,7 +7,7 @@ export default defineConfig({
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [
-      { text: "Features", link: "/features/scripts" },
+      { text: "Features", link: "/features/commands" },
       { text: "Commands", link: "/commands/add.md" },
       { text: "Settings", link: "/settings" },
     ],
@@ -18,25 +18,16 @@ export default defineConfig({
     sidebar: {
       "/features/": [
         {
+          text: "Commands",
+          link: "/features/commands.md",
+        },
+        {
           text: "Scripts",
-          items: [
-            { text: "Introduction", link: "/features/scripts/index.md" },
-            { text: "Run & Debug", link: "/features/scripts/run_and_debug" },
-            { text: "Environments", link: "/features/scripts/environments" },
-          ],
+          link: "/features/scripts.md",
         },
         {
           text: "Dependency management",
-          items: [
-            {
-              text: "Introduction",
-              link: "/features/dependency-management/index.md",
-            },
-            {
-              text: "Manage Dependencies",
-              link: "/features/dependency-management/manage-dependencies.md",
-            },
-          ],
+          link: "/features/dependency-management.md",
         },
       ],
       "/commands/": [

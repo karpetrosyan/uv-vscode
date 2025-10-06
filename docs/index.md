@@ -7,7 +7,7 @@ hero:
   actions:
     - theme: brand
       text: Features
-      link: /features/scripts
+      link: /features/commands
     - theme: alt
       text: View on GitHub
       link: https://github.com/karpetrosyan/uv-vscode
