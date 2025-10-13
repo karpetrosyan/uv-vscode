@@ -1,3 +1,8 @@
+## [0.32.0] - 2025-10-13
+
+### ⚙️ Miscellaneous Tasks
+
+- Don't specify default version when creating python script
 ## [0.30.0] - 2025-10-06
 
 ### 🐛 Bug Fixes
