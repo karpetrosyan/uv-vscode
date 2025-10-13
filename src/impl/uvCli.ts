@@ -38,19 +38,6 @@ function isUvOptionPresent(
   }
 }
 
-function getCommandDefaults(command: UvCommand, input: string): string[] {
-  switch (command) {
-    case "init":
-      return [...(isUvOptionPresent(input, "python") ? [] : ["--python=3.12"])];
-    case "add":
-    case "remove":
-    case "sync":
-      return [];
-    default:
-      return [];
-  }
-}
-
 export default class UvCliImpl<T extends UvCommand> implements UvCli<T> {
   constructor(
     public command: T,
@@ -96,7 +83,6 @@ export default class UvCliImpl<T extends UvCommand> implements UvCli<T> {
       this.command,
       ...(supportsScriptOption(this.command) ? scriptOption : []),
       ...directoryOption,
-      ...getCommandDefaults(this.command, input ?? ""),
       ...(input === "" ? [] : splitedInput),
     ];
 
