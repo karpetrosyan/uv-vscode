@@ -1,3 +1,8 @@
+## [0.36.0] - 2025-10-16
+
+### 🚀 Features
+
+- Try to enter script environment when file changes
 ## [0.32.0] - 2025-10-13
 
 ### ⚙️ Miscellaneous Tasks
