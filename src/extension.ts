@@ -54,40 +54,58 @@ export async function activate(context: vscode.ExtensionContext) {
     dependencyProvider.refresh();
   }, 1000);
 
-  const getActiveTextEditorChangeDisposable = () => {
-    return vscode.window.onDidChangeActiveTextEditor(async (e) => {
-      if (!e) {
+  const onFileChangeHandler = async (e: vscode.TextEditor | undefined) => {
+    if (!e) {
+      return;
+    }
+    const selectCommand = new SelectScriptInterpreterCommand(
+      e.document.uri.fsPath ?? "",
+      uvBinaryPath,
+      projectRoot.uri.fsPath,
+      new VscodeApiInterpreterManager(pythonExtension),
+      new ShellSubcommandExecutor(logger),
+    );
+
+    try {
+      const wasScript = await selectCommand.run();
+      if (!wasScript) {
+        const exitCommand = new ExitScriptEnvironment(
+          new VscodeApiInterpreterManager(pythonExtension),
+        );
+
+        await exitCommand.run();
+      }
+    } catch (error) {
+      vscode.window.showErrorMessage(
+        `Error selecting interpreter for script: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
+    }
+  };
+
+  const getTextDocumentChangeDisposable = () => {
+    return vscode.workspace.onDidChangeTextDocument((e) => {
+      const activeEditor = vscode.window.activeTextEditor;
+
+      // Check if the changed document is the active one
+      if (activeEditor && e.document !== activeEditor.document) {
         return;
       }
-      const selectCommand = new SelectScriptInterpreterCommand(
-        e.document.uri.fsPath ?? "",
-        uvBinaryPath,
-        projectRoot.uri.fsPath,
-        new VscodeApiInterpreterManager(pythonExtension),
-        new ShellSubcommandExecutor(logger),
-      );
-
-      try {
-        const wasScript = await selectCommand.run();
-        if (!wasScript) {
-          const exitCommand = new ExitScriptEnvironment(
-            new VscodeApiInterpreterManager(pythonExtension),
-          );
-
-          await exitCommand.run();
-        }
-      } catch (error) {
-        vscode.window.showErrorMessage(
-          `Error selecting interpreter for script: ${
-            error instanceof Error ? error.message : String(error)
-          }`,
-        );
-      }
+      onFileChangeHandler(activeEditor);
     });
+  };
+
+  const getActiveTextEditorChangeDisposable = () => {
+    return vscode.window.onDidChangeActiveTextEditor(onFileChangeHandler);
   };
   let activeTextEditorChangeDisposable: undefined | vscode.Disposable =
     config.autoSelectInterpreterForScripts
       ? getActiveTextEditorChangeDisposable()
+      : undefined;
+  let textDocumentChangeDisposable: undefined | vscode.Disposable =
+    config.autoSelectInterpreterForScripts
+      ? getTextDocumentChangeDisposable()
       : undefined;
 
   if (activeTextEditorChangeDisposable !== undefined) {
@@ -203,6 +221,7 @@ export async function activate(context: vscode.ExtensionContext) {
           if (e.affectsConfiguration("uv.autoSelectInterpreterForScripts")) {
             if (!config.autoSelectInterpreterForScripts) {
               activeTextEditorChangeDisposable?.dispose();
+              textDocumentChangeDisposable?.dispose();
               activeTextEditorChangeDisposable = undefined;
               logger.info(
                 "Auto select interpreter for scripts disabled, listener removed",
@@ -211,6 +230,8 @@ export async function activate(context: vscode.ExtensionContext) {
               if (activeTextEditorChangeDisposable === undefined) {
                 activeTextEditorChangeDisposable =
                   getActiveTextEditorChangeDisposable();
+                textDocumentChangeDisposable =
+                  getTextDocumentChangeDisposable();
                 context.subscriptions.push(activeTextEditorChangeDisposable);
               }
               logger.info(
