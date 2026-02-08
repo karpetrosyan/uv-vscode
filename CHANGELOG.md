@@ -1,3 +1,8 @@
+## [0.36.0] - 2026-02-08
+
+### ⚙️ Miscellaneous Tasks
+
+- Bump uv version
 ## [0.36.0] - 2025-10-16
 
 ### 🚀 Features
