@@ -63,6 +63,10 @@ export default defineConfig({
               link: "/commands/initScript.md",
             },
             {
+              text: "Run Script",
+              link: "/commands/run.md",
+            },
+            {
               text: "Show Logs",
               link: "/commands/showLogs.md",
             },

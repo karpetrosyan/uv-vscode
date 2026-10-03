@@ -1,6 +1,7 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode";
+import path from "path";
 import { findUvBinaryPath } from "./uv_binary";
 import { PythonExtension } from "@vscode/python-extension";
 import SelectScriptInterpreterCommand from "./commands/selectInlineScriptInterpreter";
@@ -11,12 +12,18 @@ import VscodeApiInputRequest, {
 import DependencyCodeLensProvider from "./ui/dependencyCodeLensProvider";
 import SelectProjectInterpreterCommand from "./commands/selectProjectInterpreter";
 import ShellSubcommandExecutor from "./impl/subcommandExecutor";
-import { getActiveTextEditorFilePath, getProjectRoot } from "./utils/vscode_";
+import {
+  copyUntitledDocument,
+  getActiveTextEditorFilePath,
+  getProjectRoot,
+} from "./utils/vscode_";
 import ExtensionLogger from "./impl/logger";
 import InitScriptCommand from "./commands/initScript";
 import { getUvVscodeSettings } from "./settings";
 import UvCliImpl from "./impl/uvCli";
 import VsCodeTerminalSender from "./impl/terminalSender";
+import type { UvCommand } from "./dependencies/uvCli";
+import { getScriptMetadata } from "./utils/inlineMetadata";
 
 export async function activate(context: vscode.ExtensionContext) {
   const validateRepoOutputChannel = vscode.window.createOutputChannel("UV", {
@@ -39,12 +46,19 @@ export async function activate(context: vscode.ExtensionContext) {
   let uvBinaryPath = await findUvBinaryPath({ settings: config });
   logger.info(`Using uv binary at path: ${uvBinaryPath}`);
 
+  // Untitled files have no file on disk, so uv works on copies of them stored here
+  const untitledScriptsDir = path.join(
+    context.globalStorageUri.fsPath,
+    "untitled",
+  );
+
   const dependencyProvider = new DependencyCodeLensProvider();
 
   vscode.languages.registerCodeLensProvider(
     [
       { scheme: "file", pattern: "**/*.py" },
       { scheme: "file", pattern: "**/*.toml" },
+      { scheme: "untitled", language: "python" },
     ],
     dependencyProvider,
   );
@@ -57,18 +71,30 @@ export async function activate(context: vscode.ExtensionContext) {
   const onFileChangeHandler = async (
     document: vscode.TextDocument | undefined,
   ) => {
-    // Untitled files, diffs, output channels, etc. have no file on disk
-    if (!document || document.uri.scheme !== "file") {
+    if (!document) {
       return;
     }
-    const filePath = document.uri.fsPath;
     const interpreterManager = new VscodeApiInterpreterManager(pythonExtension);
     const subcommandExecutor = new ShellSubcommandExecutor(logger);
 
     try {
+      let filePath: string;
+      if (document.isUntitled) {
+        if (getScriptMetadata(document.getText()) === undefined) {
+          return;
+        }
+        filePath = (await copyUntitledDocument(untitledScriptsDir, document))
+          .filePath;
+      } else if (document.uri.scheme === "file") {
+        filePath = document.uri.fsPath;
+      } else {
+        // Diffs, output channels, etc. have no file on disk
+        return;
+      }
+
       // A script uses its own environment instead of the project's one
       const wasScript =
-        document.languageId === "python" &&
+        (document.isUntitled || document.languageId === "python") &&
         (await new SelectScriptInterpreterCommand(
           filePath,
           uvBinaryPath,
@@ -110,6 +136,33 @@ export async function activate(context: vscode.ExtensionContext) {
     });
   };
 
+  const getUntitledDocumentChangeDisposable = () => {
+    // Untitled files are never saved, so we enter their environment
+    // when their inline metadata changes instead
+    const lastMetadata = new Map<string, string | undefined>();
+    let timeout: NodeJS.Timeout | undefined;
+
+    return vscode.workspace.onDidChangeTextDocument(({ document }) => {
+      if (
+        !document.isUntitled ||
+        document !== vscode.window.activeTextEditor?.document
+      ) {
+        return;
+      }
+
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        const key = document.uri.toString();
+        const metadata = getScriptMetadata(document.getText());
+        if (metadata === lastMetadata.get(key)) {
+          return;
+        }
+        lastMetadata.set(key, metadata);
+        onFileChangeHandler(document);
+      }, 1000);
+    });
+  };
+
   const getActiveTextEditorChangeDisposable = () => {
     return vscode.window.onDidChangeActiveTextEditor((editor) =>
       onFileChangeHandler(editor?.document),
@@ -123,107 +176,57 @@ export async function activate(context: vscode.ExtensionContext) {
     config.autoSelectInterpreterForScripts
       ? getTextDocumentSaveDisposable()
       : undefined;
+  let untitledDocumentChangeDisposable: undefined | vscode.Disposable =
+    config.autoSelectInterpreterForScripts
+      ? getUntitledDocumentChangeDisposable()
+      : undefined;
 
   if (activeTextEditorChangeDisposable !== undefined) {
     context.subscriptions.push(activeTextEditorChangeDisposable);
   }
 
+  const runUvCli = async (command: UvCommand) => {
+    const document = vscode.window.activeTextEditor?.document;
+    const untitledScript =
+      document?.isUntitled &&
+      getScriptMetadata(document.getText()) !== undefined
+        ? await copyUntitledDocument(untitledScriptsDir, document)
+        : undefined;
+
+    await new UvCliImpl(
+      command,
+      new VscodeApiInputRequest(),
+      new ShellSubcommandExecutor(logger),
+      projectRoot.uri.fsPath,
+      uvBinaryPath,
+      logger,
+      // We can't know when a command sent to the terminal has finished,
+      // so the changes couldn't be applied back to the untitled file
+      untitledScript ? { ...config, sendUvCommandToTerminal: false } : config,
+      new VsCodeTerminalSender(),
+      document?.isUntitled
+        ? untitledScript?.filePath
+        : getActiveTextEditorFilePath(),
+    ).run();
+
+    await untitledScript?.applyChanges();
+  };
+
   // UV Commands
+  const uvCommands: UvCommand[] = [
+    "add",
+    "remove",
+    "init",
+    "sync",
+    "lock",
+    "venv",
+  ];
   context.subscriptions.push(
-    // add
-    vscode.commands.registerCommand("uv-vscode.add", async () => {
-      const command = new UvCliImpl(
-        "add",
-        new VscodeApiInputRequest(),
-        new ShellSubcommandExecutor(logger),
-        projectRoot.uri.fsPath,
-        uvBinaryPath,
-        logger,
-        config,
-        new VsCodeTerminalSender(),
-        getActiveTextEditorFilePath(),
-      );
-      await command.run();
-    }),
-    // remove
-    vscode.commands.registerCommand("uv-vscode.remove", async () => {
-      const command = new UvCliImpl(
-        "remove",
-        new VscodeApiInputRequest(),
-        new ShellSubcommandExecutor(logger),
-        projectRoot.uri.fsPath,
-        uvBinaryPath,
-        logger,
-        config,
-        new VsCodeTerminalSender(),
-        getActiveTextEditorFilePath(),
-      );
-      await command.run();
-    }),
-
-    // init
-    vscode.commands.registerCommand("uv-vscode.init", async () => {
-      const command = new UvCliImpl(
-        "init",
-        new VscodeApiInputRequest(),
-        new ShellSubcommandExecutor(logger),
-        projectRoot.uri.fsPath,
-        uvBinaryPath,
-        logger,
-        config,
-        new VsCodeTerminalSender(),
-        getActiveTextEditorFilePath(),
-      );
-      await command.run();
-    }),
-
-    // sync
-    vscode.commands.registerCommand("uv-vscode.sync", async () => {
-      const command = new UvCliImpl(
-        "sync",
-        new VscodeApiInputRequest(),
-        new ShellSubcommandExecutor(logger),
-        projectRoot.uri.fsPath,
-        uvBinaryPath,
-        logger,
-        config,
-        new VsCodeTerminalSender(),
-        getActiveTextEditorFilePath(),
-      );
-      await command.run();
-    }),
-
-    // lock
-    vscode.commands.registerCommand("uv-vscode.lock", async () => {
-      const command = new UvCliImpl(
-        "lock",
-        new VscodeApiInputRequest(),
-        new ShellSubcommandExecutor(logger),
-        projectRoot.uri.fsPath,
-        uvBinaryPath,
-        logger,
-        config,
-        new VsCodeTerminalSender(),
-        getActiveTextEditorFilePath(),
-      );
-      await command.run();
-    }),
-
-    // venv
-    vscode.commands.registerCommand("uv-vscode.venv", async () => {
-      const command = new UvCliImpl(
-        "venv",
-        new VscodeApiInputRequest(),
-        new ShellSubcommandExecutor(logger),
-        projectRoot.uri.fsPath,
-        uvBinaryPath,
-        logger,
-        config,
-        new VsCodeTerminalSender(),
-        getActiveTextEditorFilePath(),
-      );
-      await command.run();
-    }),
+    ...uvCommands.map((command) =>
+      vscode.commands.registerCommand(`uv-vscode.${command}`, () =>
+        runUvCli(command),
+      ),
+    ),
   );
 
   context.subscriptions.push(
@@ -238,6 +241,7 @@ export async function activate(context: vscode.ExtensionContext) {
             if (!config.autoSelectInterpreterForScripts) {
               activeTextEditorChangeDisposable?.dispose();
               textDocumentSaveDisposable?.dispose();
+              untitledDocumentChangeDisposable?.dispose();
               activeTextEditorChangeDisposable = undefined;
               logger.info(
                 "Auto select interpreter for scripts disabled, listener removed",
@@ -247,6 +251,8 @@ export async function activate(context: vscode.ExtensionContext) {
                 activeTextEditorChangeDisposable =
                   getActiveTextEditorChangeDisposable();
                 textDocumentSaveDisposable = getTextDocumentSaveDisposable();
+                untitledDocumentChangeDisposable =
+                  getUntitledDocumentChangeDisposable();
                 context.subscriptions.push(activeTextEditorChangeDisposable);
               }
               logger.info(
@@ -260,7 +266,12 @@ export async function activate(context: vscode.ExtensionContext) {
 
     // initScript
     vscode.commands.registerCommand("uv-vscode.initScript", async () => {
-      const activeFilePath = getActiveTextEditorFilePath();
+      const document = vscode.window.activeTextEditor?.document;
+      const untitledScript = document?.isUntitled
+        ? await copyUntitledDocument(untitledScriptsDir, document)
+        : undefined;
+      const activeFilePath =
+        untitledScript?.filePath ?? getActiveTextEditorFilePath();
 
       if (!activeFilePath) {
         vscode.window.showErrorMessage("No active text editor found.");
@@ -274,9 +285,11 @@ export async function activate(context: vscode.ExtensionContext) {
           projectRoot.uri.fsPath,
           uvBinaryPath,
           logger,
-          config,
+          untitledScript
+            ? { ...config, sendUvCommandToTerminal: false }
+            : config,
           new VsCodeTerminalSender(),
-          getActiveTextEditorFilePath(),
+          activeFilePath,
           ["--script", activeFilePath],
         ),
         new SelectScriptInterpreterCommand(
@@ -288,6 +301,29 @@ export async function activate(context: vscode.ExtensionContext) {
         ),
       );
       await command.run();
+      await untitledScript?.applyChanges();
+    }),
+    // run
+    vscode.commands.registerCommand("uv-vscode.run", async () => {
+      const document = vscode.window.activeTextEditor?.document;
+      if (!document) {
+        vscode.window.showErrorMessage("No active text editor found.");
+        return;
+      }
+
+      let filePath: string;
+      if (document.isUntitled) {
+        filePath = (await copyUntitledDocument(untitledScriptsDir, document))
+          .filePath;
+      } else {
+        await document.save();
+        filePath = document.uri.fsPath;
+      }
+
+      new VsCodeTerminalSender().sendText(
+        `${uvBinaryPath} run --script "${filePath}"`,
+        true,
+      );
     }),
     // show logs
     vscode.commands.registerCommand("uv-vscode.showLogs", async () => {

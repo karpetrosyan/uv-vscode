@@ -1,6 +1,15 @@
 import * as fs from "fs-extra";
 import path from "path";
-import { Uri, window, workspace, type WorkspaceFolder } from "vscode";
+import {
+  Range,
+  Uri,
+  window,
+  workspace,
+  WorkspaceEdit,
+  type TextDocument,
+  type WorkspaceFolder,
+} from "vscode";
+import { getTextReplacement } from "./textReplacement";
 
 export function getActiveTextEditorFilePath(): string | undefined {
   const editor = window.activeTextEditor;
@@ -46,4 +55,50 @@ export async function getProjectRoot(): Promise<WorkspaceFolder> {
     // @ts-expect-error TS2322
     return rootWorkspace;
   }
+}
+
+const toLf = (text: string) => text.replace(/\r\n/g, "\n");
+
+/**
+ * Untitled documents have no file on disk, so uv works on a copy of them.
+ * `applyChanges` brings the changes that uv made to the copy back to the document.
+ */
+export async function copyUntitledDocument(
+  directory: string,
+  document: TextDocument,
+): Promise<{ filePath: string; applyChanges: () => Promise<void> }> {
+  const filePath = path.join(directory, path.basename(document.uri.fsPath));
+  const text = toLf(document.getText());
+  await fs.outputFile(filePath, text);
+
+  const applyChanges = async () => {
+    const replacement = getTextReplacement(
+      text,
+      toLf(await fs.readFile(filePath, "utf8")),
+    );
+    if (!replacement) {
+      return;
+    }
+    if (toLf(document.getText()) !== text) {
+      window.showWarningMessage(
+        "The file was edited while uv was running, so the changes made by uv were not applied to it.",
+      );
+      return;
+    }
+
+    const edit = new WorkspaceEdit();
+    edit.replace(
+      document.uri,
+      new Range(
+        replacement.start.line,
+        replacement.start.character,
+        replacement.end.line,
+        replacement.end.character,
+      ),
+      replacement.text,
+    );
+    await workspace.applyEdit(edit);
+  };
+
+  return { filePath, applyChanges };
 }

@@ -1,6 +1,7 @@
 import { test, expect } from "vitest";
 import {
   type CodeLine,
+  getScriptMetadata,
   IdleState,
   type State,
 } from "../../src/utils/inlineMetadata";
@@ -137,4 +138,36 @@ test("Processes invalid format", () => {
       "type": "error",
     }
   `);
+});
+
+test("getScriptMetadata returns the content of the inline metadata", () => {
+  const text = `#!/usr/bin/env python
+# /// script
+# requires-python = ">=3.12"
+# dependencies = [
+#     "requests",
+# ]
+# ///
+
+import requests
+`;
+
+  expect(getScriptMetadata(text)).toMatchInlineSnapshot(`
+    "requires-python = ">=3.12"
+    dependencies = [
+    "requests",
+    ]"
+  `);
+  expect(getScriptMetadata(text.replaceAll("\n", "\r\n"))).toStrictEqual(
+    getScriptMetadata(text),
+  );
+});
+
+test("getScriptMetadata returns undefined when there is no inline metadata", () => {
+  expect(getScriptMetadata("")).toBeUndefined();
+  expect(getScriptMetadata("import requests\n")).toBeUndefined();
+  // The metadata block is not closed
+  expect(
+    getScriptMetadata("# /// script\n# dependencies = []\n"),
+  ).toBeUndefined();
 });

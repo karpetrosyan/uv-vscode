@@ -56,6 +56,11 @@
         "title": "Initialize Script"
       },
       {
+        "command": "uv-vscode.run",
+        "category": "Uv",
+        "title": "Run Script"
+      },
+      {
         "command": "uv-vscode.init",
         "category": "Uv",
         "title": "Initialize a new project"

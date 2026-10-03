@@ -186,6 +186,30 @@ const processLineForToml = (
   return state;
 };
 
+/**
+ * Returns the content of the inline metadata of the script,
+ * or undefined if the text is not a PEP 723 compatible script
+ */
+export function getScriptMetadata(text: string): string | undefined {
+  let state = IdleState({ inlineMetadataFromScript: true }) as State;
+
+  for (const [index, line] of text.split(/\r?\n/).entries()) {
+    const event = { line: { lineNumber: index, text: line } };
+
+    if (state.type === "idle") {
+      state = state.feedEvent(state, event);
+    } else if (state.type === "processing") {
+      state = state.feedEvent(state, event);
+    } else {
+      break;
+    }
+  }
+
+  return state.type === "parsed"
+    ? state.processedLines.map((line) => line.text).join("\n")
+    : undefined;
+}
+
 export async function isScriptPath(filePath: string): Promise<boolean> {
   if (filePath.endsWith(".toml")) {
     return false;

@@ -55,6 +55,15 @@ If there is no `pyproject.toml` between the file and the opened folder, the envi
 > [!NOTE]
 > The extension doesn't create the project's environment. If the project has no virtual environment yet, uv picks another Python interpreter that fits the project.
 
+## Untitled Files
+
+A script doesn't have to be saved for any of this to work. Open a new untitled file, write or paste a script with inline metadata, and the extension will enter its environment shortly after you stop typing.
+
+`uv` needs a real file to work with, so the extension keeps a copy of the untitled file in its own storage and runs `uv` against that copy. When a command changes the inline metadata, like [add](../commands/add.md), [remove](../commands/remove.md) or [initScript](../commands/initScript.md), the change is applied back to the untitled file.
+
+> [!NOTE]
+> For untitled scripts these commands are always executed directly, even when [uv.sendUvCommandToTerminal](../settings/index.md) is enabled, because the extension has to know when the command finishes to apply the changes back.
+
 ## Run
 
 If you’ve ever used VS Code to write Python code, you might have noticed that when using the Python extension, there’s a handy button you can press to run an individual Python file in a terminal.
@@ -75,6 +84,8 @@ But it just runs the file as a normal Python script, without respecting inline m
 
 ![run script](/run-script.gif){.light-only}
 ![run script](/run-script-dark.gif){.dark-only}
+
+The run button belongs to the Python extension, which refuses to run a file that was never saved. For untitled scripts, use the [Run Script](../commands/run.md) command instead; it works for saved scripts too.
 
 ## Debug
 

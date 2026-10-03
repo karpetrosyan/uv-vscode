@@ -18,7 +18,7 @@ The extension adds small buttons directly above the dependencies section in a fi
 ![manage-deps-lenses](/manage-deps-lenses.png){.light-only}
 ![manage-deps-lenses](/manage-deps-lenses-dark.png){.dark-only}
 
-These same buttons also work for Python scripts with inline metadata, so you don’t need to use the terminal with the `--script` flag.
+These same buttons also work for Python scripts with inline metadata, including [untitled ones](scripts.md#untitled-files), so you don’t need to use the terminal with the `--script` flag.
 
 ## Add, Remove, and Update
 
