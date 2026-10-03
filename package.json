@@ -75,7 +75,7 @@
         "category": "Uv",
         "title": "Lock dependencies"
       },
-        {
+      {
         "command": "uv-vscode.venv",
         "category": "Uv",
         "title": "Create Virtual Environment"
@@ -121,6 +121,7 @@
     "@typescript-eslint/parser": "^8.31.1",
     "@vscode/test-cli": "^0.0.10",
     "@vscode/test-electron": "^2.5.2",
+    "@vscode/vsce": "^4.0.0",
     "esbuild": "^0.25.3",
     "eslint": "^9.25.1",
     "eslint-config-prettier": "^10.1.8",
