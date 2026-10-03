@@ -1,3 +1,18 @@
+## [0.40.0] - 2026-10-03
+
+### 🚀 Features
+
+- Enter the environment of the closest project
+- Support untitled scripts
+
+### 🐛 Bug Fixes
+
+- Cancel commands when the input is dismissed
+
+### ⚙️ Miscellaneous Tasks
+
+- Pin vsce
+- Bump uv version
 ## [0.36.0] - 2026-02-08
 
 ### ⚙️ Miscellaneous Tasks
