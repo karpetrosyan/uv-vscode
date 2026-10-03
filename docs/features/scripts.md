@@ -41,14 +41,19 @@ As [VS Code states](https://code.visualstudio.com/docs/python/environments): an 
 
 When working on a project in VS Code, you need to configure the virtual environment to point to the interpreter that has access to the dependencies your project needs, so the IDE can provide suggestions and autocompletion.
 
-When using the extension, it will automatically switch the environment to a script's environment when you open a file that contains inline metadata. This ensures that you get autocompletion and all the necessary features when working with a Python script.
+When using the extension, it will automatically switch the environment to a script's environment when you switch to, or save, a file that contains inline metadata. This ensures that you get autocompletion and all the necessary features when working with a Python script.
 
 ![run script](/change-environments.gif){.light-only}
 ![run script](/change-environments-dark.gif){.dark-only}
 
-The extension will remember the last environment you used for a script, and when switching to a non-script file, it will switch back to that environment so you can continue working on your main project.
+When you switch to a file that is not a script, the extension looks for the closest `pyproject.toml`, starting from the file's folder and going up to the folder opened in VS Code (never above it), and switches to the environment of that project.
 
-This simplifies working with script files alongside your main project: just open the script file, work with it, and then close it to get your main project environment back.
+This simplifies working with script files alongside your main project, and with several projects in one folder: every file uses the environment of the project it belongs to, and a script always uses its own.
+
+If there is no `pyproject.toml` between the file and the opened folder, the environment is left as it is.
+
+> [!NOTE]
+> The extension doesn't create the project's environment. If the project has no virtual environment yet, uv picks another Python interpreter that fits the project.
 
 ## Run
 

@@ -35,7 +35,7 @@
         "uv.autoSelectInterpreterForScripts": {
           "type": "boolean",
           "default": true,
-          "description": "If true, uv will automatically select the appropriate Python interpreter for PEP 723 compatible scripts."
+          "description": "If true, uv will automatically select the appropriate Python interpreter for PEP 723 compatible scripts, and the interpreter of the closest project (pyproject.toml) for other files."
         }
       }
     },

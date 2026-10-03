@@ -9,7 +9,7 @@ import VscodeApiInputRequest, {
   PredefinedInputRequester,
 } from "./impl/inputRequester";
 import DependencyCodeLensProvider from "./ui/dependencyCodeLensProvider";
-import ExitScriptEnvironment from "./commands/exitScriptEnvironment";
+import SelectProjectInterpreterCommand from "./commands/selectProjectInterpreter";
 import ShellSubcommandExecutor from "./impl/subcommandExecutor";
 import { getActiveTextEditorFilePath, getProjectRoot } from "./utils/vscode_";
 import ExtensionLogger from "./impl/logger";
@@ -54,58 +54,74 @@ export async function activate(context: vscode.ExtensionContext) {
     dependencyProvider.refresh();
   }, 1000);
 
-  const onFileChangeHandler = async (e: vscode.TextEditor | undefined) => {
-    if (!e) {
+  const onFileChangeHandler = async (
+    document: vscode.TextDocument | undefined,
+  ) => {
+    // Untitled files, diffs, output channels, etc. have no file on disk
+    if (!document || document.uri.scheme !== "file") {
       return;
     }
-    const selectCommand = new SelectScriptInterpreterCommand(
-      e.document.uri.fsPath ?? "",
-      uvBinaryPath,
-      projectRoot.uri.fsPath,
-      new VscodeApiInterpreterManager(pythonExtension),
-      new ShellSubcommandExecutor(logger),
-    );
+    const filePath = document.uri.fsPath;
+    const interpreterManager = new VscodeApiInterpreterManager(pythonExtension);
+    const subcommandExecutor = new ShellSubcommandExecutor(logger);
 
     try {
-      const wasScript = await selectCommand.run();
-      if (!wasScript) {
-        const exitCommand = new ExitScriptEnvironment(
-          new VscodeApiInterpreterManager(pythonExtension),
-        );
-
-        await exitCommand.run();
+      // A script uses its own environment instead of the project's one
+      const wasScript =
+        document.languageId === "python" &&
+        (await new SelectScriptInterpreterCommand(
+          filePath,
+          uvBinaryPath,
+          projectRoot.uri.fsPath,
+          interpreterManager,
+          subcommandExecutor,
+        ).run());
+      if (wasScript) {
+        return;
       }
+
+      const workspaceFolder = vscode.workspace.getWorkspaceFolder(document.uri);
+      if (!workspaceFolder) {
+        return;
+      }
+      await new SelectProjectInterpreterCommand(
+        filePath,
+        workspaceFolder.uri.fsPath,
+        uvBinaryPath,
+        interpreterManager,
+        subcommandExecutor,
+      ).run();
     } catch (error) {
       vscode.window.showErrorMessage(
-        `Error selecting interpreter for script: ${
+        `Error selecting interpreter: ${
           error instanceof Error ? error.message : String(error)
         }`,
       );
     }
   };
 
-  const getTextDocumentChangeDisposable = () => {
-    return vscode.workspace.onDidChangeTextDocument((e) => {
-      const activeEditor = vscode.window.activeTextEditor;
-
-      // Check if the changed document is the active one
-      if (activeEditor && e.document !== activeEditor.document) {
+  const getTextDocumentSaveDisposable = () => {
+    return vscode.workspace.onDidSaveTextDocument((document) => {
+      // Check if the saved document is the active one
+      if (document !== vscode.window.activeTextEditor?.document) {
         return;
       }
-      onFileChangeHandler(activeEditor);
+      onFileChangeHandler(document);
     });
   };
 
   const getActiveTextEditorChangeDisposable = () => {
-    return vscode.window.onDidChangeActiveTextEditor(onFileChangeHandler);
+    return vscode.window.onDidChangeActiveTextEditor((editor) =>
+      onFileChangeHandler(editor?.document),
+    );
   };
   let activeTextEditorChangeDisposable: undefined | vscode.Disposable =
     config.autoSelectInterpreterForScripts
       ? getActiveTextEditorChangeDisposable()
       : undefined;
-  let textDocumentChangeDisposable: undefined | vscode.Disposable =
+  let textDocumentSaveDisposable: undefined | vscode.Disposable =
     config.autoSelectInterpreterForScripts
-      ? getTextDocumentChangeDisposable()
+      ? getTextDocumentSaveDisposable()
       : undefined;
 
   if (activeTextEditorChangeDisposable !== undefined) {
@@ -221,7 +237,7 @@ export async function activate(context: vscode.ExtensionContext) {
           if (e.affectsConfiguration("uv.autoSelectInterpreterForScripts")) {
             if (!config.autoSelectInterpreterForScripts) {
               activeTextEditorChangeDisposable?.dispose();
-              textDocumentChangeDisposable?.dispose();
+              textDocumentSaveDisposable?.dispose();
               activeTextEditorChangeDisposable = undefined;
               logger.info(
                 "Auto select interpreter for scripts disabled, listener removed",
@@ -230,8 +246,7 @@ export async function activate(context: vscode.ExtensionContext) {
               if (activeTextEditorChangeDisposable === undefined) {
                 activeTextEditorChangeDisposable =
                   getActiveTextEditorChangeDisposable();
-                textDocumentChangeDisposable =
-                  getTextDocumentChangeDisposable();
+                textDocumentSaveDisposable = getTextDocumentSaveDisposable();
                 context.subscriptions.push(activeTextEditorChangeDisposable);
               }
               logger.info(

@@ -8,9 +8,6 @@ import {
 import SelectScriptInterpreterCommand from "../../src/commands/selectInlineScriptInterpreter";
 import { join } from "node:path";
 import { writeFileSync } from "node:fs";
-import { SCRIPTS_ENV_DIR } from "../../src/constants";
-
-const getScriptPath = (fileName: string) => join(SCRIPTS_ENV_DIR, fileName);
 
 test("SelectScriptInterpreter with non-script file", async () => {
   const subcommandExecutor = new FakeSubcommandExecutor();
@@ -56,17 +53,14 @@ test("SelectScriptInterpreter with script file", async () => {
   expect(interpreterManager.currentInterpreterPath).toMatchInlineSnapshot(
     `"some/path"`,
   );
-  expect(interpreterManager.previousInterpreterPath).toMatchInlineSnapshot(
-    `undefined`,
-  );
 });
 
 test("SelectScriptInterpreter multiple times", async () => {
   const subcommandExecutor = new FakeSubcommandExecutor([
     "sync-ok",
-    getScriptPath("script1.py"),
+    "envs/script1.py",
     "sync-ok",
-    getScriptPath("script2.py"),
+    "envs/script2.py",
   ]);
   const interpreterManager = new FakeInterpreterManager();
   interpreterManager.currentInterpreterPath = "some/path";
@@ -93,7 +87,4 @@ test("SelectScriptInterpreter multiple times", async () => {
   expect(
     interpreterManager.currentInterpreterPath?.endsWith("script2.py"),
   ).toBe(true);
-  expect(interpreterManager.previousInterpreterPath).toMatchInlineSnapshot(
-    `"some/path"`,
-  );
 });
