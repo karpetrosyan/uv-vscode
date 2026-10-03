@@ -5,7 +5,7 @@ The extension maps `VS Code` commands to [uv commands](https://docs.astral.sh/uv
 ![run script](/command-palette.png){.light-only}
 ![run script](/command-palette-dark.png){.dark-only}
 
-Some commands require input; you can provide arguments and options that will be passed to `uv`.
+Some commands require input; you can provide arguments and options that will be passed to `uv`. Dismissing the input box, for example with `Esc`, cancels the command.
 
 For example, if you provide an input like `--package myproject` to the init command, the executed `uv` command would look like this:
 

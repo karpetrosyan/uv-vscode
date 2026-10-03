@@ -47,7 +47,7 @@ describe("UvCliImpl", () => {
       `);
     });
 
-    it("should throw error when no input provided for add command", async () => {
+    it("should not execute add command when input is cancelled", async () => {
       const inputRequester = new FakeInputRequester([undefined]);
       const executor = new FakeSubcommandExecutor();
       const logger = new FakeLogger();
@@ -63,9 +63,9 @@ describe("UvCliImpl", () => {
         new FakeTerminalSender(),
       );
 
-      await expect(cli.run()).rejects.toThrowErrorMatchingInlineSnapshot(
-        `[Error: No input provided for the dependency.]`,
-      );
+      await cli.run();
+
+      expect(executor.inputs).toMatchInlineSnapshot(`[]`);
     });
 
     it("should add multiple dependencies", async () => {
@@ -174,7 +174,7 @@ describe("UvCliImpl", () => {
       `);
     });
 
-    it("should throw error when no input provided for remove command", async () => {
+    it("should not execute remove command when input is cancelled", async () => {
       const inputRequester = new FakeInputRequester([undefined]);
       const executor = new FakeSubcommandExecutor();
       const logger = new FakeLogger();
@@ -190,9 +190,9 @@ describe("UvCliImpl", () => {
         new FakeTerminalSender(),
       );
 
-      await expect(cli.run()).rejects.toThrowErrorMatchingInlineSnapshot(
-        `[Error: No input provided for the dependency.]`,
-      );
+      await cli.run();
+
+      expect(executor.inputs).toMatchInlineSnapshot(`[]`);
     });
 
     it("should remove multiple dependencies", async () => {
@@ -272,7 +272,7 @@ describe("UvCliImpl", () => {
       `);
     });
 
-    it("should not throw error when no input provided for sync", async () => {
+    it("should not execute sync command when input is cancelled", async () => {
       const inputRequester = new FakeInputRequester([undefined]);
       const executor = new FakeSubcommandExecutor();
       const logger = new FakeLogger();
@@ -288,12 +288,9 @@ describe("UvCliImpl", () => {
         new FakeTerminalSender(),
       );
 
-      await expect(cli.run()).resolves.not.toThrow();
-      expect(executor.inputs).toMatchInlineSnapshot(`
-        [
-          "/path/to/uv sync --directory /project/root",
-        ]
-      `);
+      await cli.run();
+
+      expect(executor.inputs).toMatchInlineSnapshot(`[]`);
     });
   });
 
@@ -373,7 +370,7 @@ describe("UvCliImpl", () => {
       `);
     });
 
-    it("should not throw error when no input provided for init", async () => {
+    it("should not execute init command when input is cancelled", async () => {
       const inputRequester = new FakeInputRequester([undefined]);
       const executor = new FakeSubcommandExecutor();
       const logger = new FakeLogger();
@@ -389,12 +386,9 @@ describe("UvCliImpl", () => {
         new FakeTerminalSender(),
       );
 
-      await expect(cli.run()).resolves.not.toThrow();
-      expect(executor.inputs).toMatchInlineSnapshot(`
-        [
-          "/path/to/uv init --directory /project/root",
-        ]
-      `);
+      await cli.run();
+
+      expect(executor.inputs).toMatchInlineSnapshot(`[]`);
     });
 
     it("should pass additional init options", async () => {
@@ -420,6 +414,36 @@ describe("UvCliImpl", () => {
           "/path/to/uv init --directory /project/root --package myproject",
         ]
       `);
+    });
+
+    it("should not split extra args on whitespace", async () => {
+      const inputRequester = new FakeInputRequester([""]);
+      const executor = new FakeSubcommandExecutor();
+      const execute = vi.spyOn(executor, "execute");
+      const logger = new FakeLogger();
+
+      const cli = new UvCliImpl(
+        "init",
+        inputRequester,
+        executor,
+        "/project/root",
+        "/path/to/uv",
+        logger,
+        mockConfig,
+        new FakeTerminalSender(),
+        undefined,
+        ["--script", "/my scripts/script.py"],
+      );
+
+      await cli.run();
+
+      expect(execute).toHaveBeenCalledWith("/path/to/uv", [
+        "init",
+        "--directory",
+        "/project/root",
+        "--script",
+        "/my scripts/script.py",
+      ]);
     });
   });
 
@@ -706,7 +730,7 @@ describe("UvCliImpl", () => {
 
       expect(executor.inputs).toMatchInlineSnapshot(`
         [
-          "/path/to/uv add --directory /project/root   requests   pytest  ",
+          "/path/to/uv add --directory /project/root requests pytest",
         ]
       `);
     });

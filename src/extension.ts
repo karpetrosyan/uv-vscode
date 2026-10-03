@@ -254,7 +254,7 @@ export async function activate(context: vscode.ExtensionContext) {
       const command = new InitScriptCommand(
         new UvCliImpl(
           "init",
-          new PredefinedInputRequester("--script " + activeFilePath),
+          new PredefinedInputRequester(""),
           new ShellSubcommandExecutor(logger),
           projectRoot.uri.fsPath,
           uvBinaryPath,
@@ -262,6 +262,7 @@ export async function activate(context: vscode.ExtensionContext) {
           config,
           new VsCodeTerminalSender(),
           getActiveTextEditorFilePath(),
+          ["--script", activeFilePath],
         ),
         new SelectScriptInterpreterCommand(
           activeFilePath,

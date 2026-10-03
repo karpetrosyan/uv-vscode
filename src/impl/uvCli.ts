@@ -8,13 +8,6 @@ import type { UvVscodeSettings } from "../settings";
 import { isScriptPath } from "../utils/inlineMetadata";
 import { isOptionPresent } from "../utils/subprocess";
 
-type ThrowOnMissingInputCommands = Extract<UvCommand, "add" | "remove">;
-function isThrowOnMissingInputCommand(
-  command: UvCommand,
-): command is ThrowOnMissingInputCommands {
-  return command === "add" || command === "remove";
-}
-
 type SupportsScriptOption = Extract<UvCommand, "add" | "remove" | "sync">;
 function supportsScriptOption(
   command: UvCommand,
@@ -49,10 +42,16 @@ export default class UvCliImpl<T extends UvCommand> implements UvCli<T> {
     public config: UvVscodeSettings,
     public terminalSender: TerminalSender,
     public activeFilePath?: string,
+    public extraArgs: string[] = [],
   ) {}
 
   async run(): Promise<void> {
     const input = await this.inputRequester.askForInput();
+
+    // The input request was cancelled
+    if (input === undefined) {
+      return;
+    }
 
     const isScript =
       this.activeFilePath !== undefined
@@ -62,28 +61,23 @@ export default class UvCliImpl<T extends UvCommand> implements UvCli<T> {
     let scriptOption: string[] = [];
 
     if (this.activeFilePath && isScript) {
-      scriptOption =
-        input !== undefined && isUvOptionPresent(input, "script")
-          ? []
-          : ["--script", this.activeFilePath];
-    }
-
-    const directoryOption: string[] =
-      input !== undefined && isUvOptionPresent(input, "directory")
+      scriptOption = isUvOptionPresent(input, "script")
         ? []
-        : ["--directory", this.projectRoot];
-
-    if (isThrowOnMissingInputCommand(this.command) && input === undefined) {
-      throw new Error("No input provided for the dependency.");
+        : ["--script", this.activeFilePath];
     }
 
-    const splitedInput = input?.split(" ").map((dep) => dep.trim()) ?? [];
+    const directoryOption: string[] = isUvOptionPresent(input, "directory")
+      ? []
+      : ["--directory", this.projectRoot];
+
+    const splitedInput = input.split(/\s+/).filter((arg) => arg !== "");
 
     const args = [
       this.command,
       ...(supportsScriptOption(this.command) ? scriptOption : []),
       ...directoryOption,
-      ...(input === "" ? [] : splitedInput),
+      ...this.extraArgs,
+      ...splitedInput,
     ];
 
     const commandsToExecute: [string, string[]][] = [];
