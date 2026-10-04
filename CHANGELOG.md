@@ -1,3 +1,13 @@
+## [0.42.0] - 2026-10-04
+
+### 🚀 Features
+
+- Support running scripts for in-memory files
+
+### 🐛 Bug Fixes
+
+- Show the terminal when a command is sent to it
+- Don't reuse a closed terminal
 ## [0.40.0] - 2026-10-03
 
 ### 🚀 Features
