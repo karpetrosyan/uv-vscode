@@ -85,7 +85,7 @@ But it just runs the file as a normal Python script, without respecting inline m
 ![run script](/run-script.gif){.light-only}
 ![run script](/run-script-dark.gif){.dark-only}
 
-The run button belongs to the Python extension, which refuses to run a file that was never saved. For untitled scripts, use the [Run Script](../commands/run.md) command instead; it works for saved scripts too.
+The run button belongs to the Python extension, which can't run a file that was never saved. For untitled Python files the extension adds its own `Run Script` button next to it, which runs a copy of the file in a terminal. The same [Run Script](../commands/run.md) command is available in the Command Palette and works for saved scripts too.
 
 ## Debug
 

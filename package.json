@@ -58,7 +58,8 @@
       {
         "command": "uv-vscode.run",
         "category": "Uv",
-        "title": "Run Script"
+        "title": "Run Script",
+        "icon": "$(play)"
       },
       {
         "command": "uv-vscode.init",
@@ -85,7 +86,16 @@
         "category": "Uv",
         "title": "Show Logs"
       }
-    ]
+    ],
+    "menus": {
+      "editor/title/run": [
+        {
+          "command": "uv-vscode.run",
+          "when": "resourceScheme == untitled && resourceLangId == python",
+          "group": "navigation@-1"
+        }
+      ]
+    }
   },
   "activationEvents": [
     "onStartupFinished"
